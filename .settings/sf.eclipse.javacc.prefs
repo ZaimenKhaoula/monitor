@@ -1,0 +1,6 @@
+CLEAR_CONSOLE=false
+JJ_NATURE=true
+RUNTIME_JJJAR=/home/khaoula/Documents/spring-tool-suite-3.9.11.RELEASE-e4.14.0-linux-gtk-x86_64/sts-bundle/sts-3.9.11.RELEASE/plugins/sf.eclipse.javacc_1.5.33/jars/javacc-5.0.jar
+RUNTIME_JTBJAR=/home/khaoula/Documents/spring-tool-suite-3.9.11.RELEASE-e4.14.0-linux-gtk-x86_64/sts-bundle/sts-3.9.11.RELEASE/plugins/sf.eclipse.javacc_1.5.33/jars/jtb-1.4.11.jar
+SUPPRESS_WARNINGS=false
+eclipse.preferences.version=1
