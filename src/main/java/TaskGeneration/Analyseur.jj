@@ -90,7 +90,8 @@ CreateNotifier task = new CreateNotifier();} {
  {return task; } }
 
 
-
+// we can read the value of admin metric(global metric) or internal metric ,
+// a get operation on internal metric enables it if it was disabled.
 ReadMonitor ReadMonitoringResource():{
 Token tok1= null;
 ReadMonitor task = new ReadMonitor();} {
