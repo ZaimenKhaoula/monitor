@@ -31,7 +31,7 @@ public class MonitoringManager  {
 	}
 
 	
-	public void taskProccessing(Task t) throws InterruptedException {
+	public void taskProccessing(Task t){
 	     
 		
 		// start monitoring task
@@ -45,7 +45,7 @@ public class MonitoringManager  {
 			if(((CreateMonitor) t).getRate() instanceof PeriodicRate ) {
 				PeriodicScraper p = new PeriodicScraper(executor,t);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
-				p.scrap(t);
+				p.scrap();
 			}
 			if(((CreateMonitor) t).getRate() instanceof StochasticRate ) {
 				
@@ -65,8 +65,9 @@ public class MonitoringManager  {
 		
 		// stop monitoring task
         if(t instanceof DeleteMonitor) {
-        		if (MonitoredMetrics.containsKey(((DeleteMonitor) t).getMetricName()) ) {(MonitoredMetrics.get(((DeleteMonitor) t).getMetricName())).cancelScraping();
-        		MonitoredMetrics.remove(((DeleteMonitor) t).getMetricName());}
+        		if (MonitoredMetrics.containsKey(((DeleteMonitor) t).getId()) ) {(MonitoredMetrics.get(((DeleteMonitor) t).getId())).cancelScraping();
+        		currentTasks.remove(((DeleteMonitor) t).getId());
+        		MonitoredMetrics.remove(((DeleteMonitor) t).getId());}
        
 		}
       //SetMetricRate
@@ -76,11 +77,11 @@ public class MonitoringManager  {
         		 task=findMonitorById(((UpdateMonitor) t).getMetricName());
         		 task.setRate(((UpdateMonitor) t).getRate());
         		(MonitoredMetrics.get(((UpdateMonitor) t).getMetricName())).cancelScraping();
-        		MonitoredMetrics.remove(((DeleteMonitor) t).getMetricName());
+        		MonitoredMetrics.remove(((DeleteMonitor) t).getId());
         		if(((CreateMonitor) t).getRate() instanceof PeriodicRate ) {
     				PeriodicScraper p = new PeriodicScraper(executor,t);
     				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
-    				p.scrap(t);
+    				p.scrap();
     			}
     			if(task.getRate() instanceof StochasticRate ) {
     				
@@ -153,7 +154,7 @@ public class MonitoringManager  {
 	    	}
 	     }
          a.start();
-	    this.currentAlertGenerators.put(((CreateNotifier)t).getNotifierId(),a);
+	    this.currentAlertGenerators.put(((CreateNotifier)t).getId(),a);
         }
         
         
@@ -182,7 +183,7 @@ public class MonitoringManager  {
      		   boolean found =false;
      		   int i=0;
      		   while(i<currentTasks.size()&& !found) {
-     			if(currentTasks.get(i) instanceof CreateNotifier && ((CreateNotifier)(currentTasks.get(i))).getNotifierId().compareTo(((ReadNotifier)t).getNotifierId())==0) {
+     			if(currentTasks.get(i) instanceof CreateNotifier && ((CreateNotifier)(currentTasks.get(i))).getId().compareTo(((ReadNotifier)t).getId())==0) {
      				   found=true;
      				   ((ReadNotifier)t).getResult().add(((CreateNotifier)currentTasks.get(i)).toString());
      			   }
@@ -249,4 +250,17 @@ public class MonitoringManager  {
 	MonitoringMessage msg= new MonitoringMessage();
     msg.getOrders().put(op, internalMetric);
 	}
+	
+	
+	public boolean taskIsActive(String id) {
+		int i=0;
+		while(i<currentTasks.size()) {
+			if((currentTasks.get(i).getId()).compareTo(id)==0) return true;
+			i++;
+			
+		}
+		return false;
+	}
+	
+	
 }

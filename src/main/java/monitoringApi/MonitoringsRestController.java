@@ -33,10 +33,11 @@ public class MonitoringsRestController {
 	
 	
 	@GetMapping("/monitorings")
-	public String getAllMonitoringTasks() throws ParseException, InterruptedException {
+	public String getAllMonitoringTasks() {
        ReadMonitor reader = new ReadMonitor();
        reader.setAll(true);
-		monitorManager.taskProccessing(reader);
+	   monitorManager.taskProccessing(reader);
+		
 		return reader.toString();
 		
 	}
@@ -84,31 +85,43 @@ public void updateoMonitoringTask(@PathVariable String id, @RequestBody JsonPatc
 	}
 	
 	@DeleteMapping("/monitorings/{MetricName}")
-public void deleteMOnitoringTask(@PathVariable String MetricName) throws InterruptedException, ParseException {
+public void deleteMonitoringTask(@PathVariable String MetricName) throws InterruptedException, ParseException {
 		DeleteMonitor deleteM = new DeleteMonitor();
-		deleteM.setMetricName(MetricName);
+		deleteM.setId(MetricName);
 		monitorManager.taskProccessing(deleteM);
 	
 		
 	}
 	@GetMapping("/notifiers")
-	public void getAllNotifierTasks() {}
+	public void getAllNotifierTasks() {
+		ReadNotifier readerN = new ReadNotifier();
+	     readerN.setAll(true);
+         monitorManager.taskProccessing(readerN);
+			
+	}
 	
 	@PostMapping("/notifiers")
-	public void addMonitoringTask(@RequestBody NotifierModel notifier) throws InterruptedException, ParseException{
+	public ResponseEntity<String> addNotifierTask(@RequestBody NotifierModel notifier) throws InterruptedException, ParseException{
 		is = new ByteArrayInputStream((notifier.toString()).getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
 		monitorManager.taskProccessing(parser.CreateNotifierResource());
 		
+		return new ResponseEntity<String> ("Notifier added succesfully" , HttpStatus.OK);
 	}
 		
    @DeleteMapping("/notifiers/{notifierId}")
-   public void deleteNotifierTask(@PathVariable String notifierId) throws InterruptedException, ParseException {
-	    DeleteNotifier deleteN = new DeleteNotifier();
+   public ResponseEntity<String> deleteNotifierTask(@PathVariable String notifierId) throws InterruptedException, ParseException {
+	  
+	   if(monitorManager.taskIsActive(notifierId)) {
+	   DeleteNotifier deleteN = new DeleteNotifier();
 	    deleteN.setNotifierId(notifierId);
 		monitorManager.taskProccessing(deleteN);
-				
+		 return new ResponseEntity<String> ("Notifier deleted succesfully" , HttpStatus.OK);
+	   }
+	   else return new ResponseEntity<String> ("Notifier not found" , HttpStatus.BAD_REQUEST);
+		   
+				 
 			}	
    
 	

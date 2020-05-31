@@ -3,18 +3,11 @@ package monitoringApi;
 import java.net.URL;
 
 public class NotifierModel {
-
-	private String notifierId;
+	
 	private String expression;
 	private URL urlToSendAlert;
 	
-	
-	public String getNotifierId() {
-		return notifierId;
-	}
-	public void setNotifierId(String notifierId) {
-		this.notifierId = notifierId;
-	}
+
 	public String getExpression() {
 		return expression;
 	}
@@ -30,7 +23,7 @@ public class NotifierModel {
 	
 	@Override	
     public String toString() {
-	return "CreateNotifier"+notifierId+"="+expression+" url "+urlToSendAlert;
+	return "CreateNotifier ="+expression+" url "+urlToSendAlert;
 	
 }
 	

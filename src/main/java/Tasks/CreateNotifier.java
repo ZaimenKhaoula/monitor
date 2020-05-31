@@ -6,7 +6,6 @@ public class CreateNotifier extends Task{
 	
 	private ArrayList<String> expression;
 	private ArrayList<String> metrics; 
-	private String NotifierId;
 	private String url;
 	public CreateNotifier() {
 	this.expression =new ArrayList<String>(); 
@@ -24,12 +23,8 @@ public class CreateNotifier extends Task{
 	public void setMetrics(ArrayList<String> metrics) {
 		this.metrics = metrics;
 	}
-	public String getNotifierId() {
-		return NotifierId;
-	}
-	public void setNotifierId(String NotifierId) {
-		this.NotifierId = NotifierId;
-	}
+
+	
 	public String getUrl() {
 		return url;
 	}
@@ -38,7 +33,7 @@ public class CreateNotifier extends Task{
 	}
 	@Override
 	public String toString() {
-		return NotifierId+" expression :"+expression+" AlertUrl :"+url;
+		return id+" expression :"+expression+" AlertUrl :"+url;
 		
 	}
 	

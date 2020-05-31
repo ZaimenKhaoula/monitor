@@ -46,7 +46,7 @@ public class StochasticScraper extends Scraper{
 	public void evaluateExression() {}
 	public void saveValue() {}
 	
-	public void scrap() throws InterruptedException {
+	public void scrap(){
 
 		
 		 while(isEnable()==true) {
@@ -54,8 +54,16 @@ public class StochasticScraper extends Scraper{
 			 future= runner.submit(scrap);
 			 endTime = System.currentTimeMillis();
 			 System.out.println(endTime);
-			 try {future.get();} catch (ExecutionException e) {e.printStackTrace();}
-			 waitNextScrap();}	 
+		
+				try {
+					future.get();
+				} catch (InterruptedException | ExecutionException e) {
+					
+				} 
+
+					waitNextScrap();
+				
+			}	 
 	 
    }
 	
@@ -70,22 +78,46 @@ public class StochasticScraper extends Scraper{
 	}
 	
 	
-	public void waitNextScrap() throws InterruptedException
+	public void waitNextScrap()
 	{
 		if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("us")==0)
-			TimeUnit.MICROSECONDS.sleep(period()-(endTime - startTime));
+			try {
+				TimeUnit.MICROSECONDS.sleep(period()-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else {
 			
 		if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("ms")==0)
-		 TimeUnit.MILLISECONDS.sleep(period()-(endTime - startTime));
+			try {
+				TimeUnit.MILLISECONDS.sleep(period()-(endTime - startTime));
+			} catch (InterruptedException e) {
+
+			}
 		else {if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("s")==0)
-			TimeUnit.SECONDS.sleep(period()-(endTime - startTime));
+			try {
+				TimeUnit.SECONDS.sleep(period()-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else {if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("min")==0)
-			 TimeUnit.MINUTES.sleep(period()-(endTime - startTime));
+			try {
+				TimeUnit.MINUTES.sleep(period()-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else {if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("h")==0)
-			TimeUnit.HOURS.sleep(period()-(endTime - startTime));
+			try {
+				TimeUnit.HOURS.sleep(period()-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else
-			TimeUnit.DAYS.sleep(period()-(endTime - startTime));
+			try {
+				TimeUnit.DAYS.sleep(period()-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		}}}}
 		
 	}

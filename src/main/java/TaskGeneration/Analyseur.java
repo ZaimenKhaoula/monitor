@@ -4,6 +4,7 @@ package TaskGeneration;
 import Tasks.*;
 
 public class Analyseur implements AnalyseurConstants {
+private  int idCounter = 0;
 
   final public void start() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -113,11 +114,10 @@ public class Analyseur implements AnalyseurConstants {
 Token tok1= null;
 CreateNotifier task = new CreateNotifier();
     jj_consume_token(createN);
-    tok1 = jj_consume_token(Id);
-                   task.setNotifierId(tok1.toString());
+          task.setId("notifier"+idCounter); idCounter++;
     jj_consume_token(operateur);
     tok1 = jj_consume_token(MetricName);
-                                                                                      task.getExpression().add(tok1.toString());task.getMetrics().add(tok1.toString());
+                                                                                       task.getExpression().add(tok1.toString());task.getMetrics().add(tok1.toString());
     label_3:
     while (true) {
       tok1 = jj_consume_token(operateur);
@@ -152,6 +152,8 @@ CreateNotifier task = new CreateNotifier();
     throw new Error("Missing return statement in function");
   }
 
+// we can read the value of admin metric(global metric) or internal metric ,
+// a get operation on internal metric enables it if it was disabled.
   final public ReadMonitor ReadMonitoringResource() throws ParseException {
 Token tok1= null;
 ReadMonitor task = new ReadMonitor();
@@ -183,7 +185,7 @@ ReadMonitor task = new ReadMonitor();
     jj_consume_token(createM);
     jj_consume_token(grammarkeyWords);
     tok1 = jj_consume_token(MetricName);
-                                                  task.getAdminmetric().setMetricName(tok1.toString());
+                                                  task.getAdminmetric().setMetricName(tok1.toString()); task.setId(tok1.toString());
     jj_consume_token(operateur);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case number:
@@ -818,4 +820,4 @@ ReadMonitor task = new ReadMonitor();
   final public void disable_tracing() {
   }
 
- }
+}

@@ -35,7 +35,7 @@ public class PeriodicScraper extends  Scraper {
 	
 	public void evaluateExression() {}
 	public void saveValue() {}
-	public void scrap(Task t) {
+	public void scrap() {
 		
 		
 		     if(isEnable())

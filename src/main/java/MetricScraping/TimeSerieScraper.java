@@ -41,7 +41,7 @@ public class TimeSerieScraper extends Scraper {
 	
 	
 	
-	public void scrap() throws InterruptedException {
+	public void scrap()  {
 		
 		boolean repeat = (((TimeSerieRate)(t.getRate())).getParameters()).contains("loop");
 		System.out.println(repeat);
@@ -55,7 +55,7 @@ public class TimeSerieScraper extends Scraper {
 	 
   }
 	
-	public void oneTimeScraping() throws InterruptedException{
+	public void oneTimeScraping(){
 		
 		 int i=1;
 		
@@ -65,7 +65,11 @@ public class TimeSerieScraper extends Scraper {
 			 future= runner.submit(scrap);
 			 endTime = System.currentTimeMillis();
 			 
-			 try {future.get();} catch (ExecutionException e) {e.printStackTrace();}
+			try {
+				future.get();
+			} catch (InterruptedException | ExecutionException e) {
+				
+			}
 			 waitNextScrap(i);
 			 i=i+2;}
 		 future= runner.submit(scrap);
@@ -80,22 +84,46 @@ public class TimeSerieScraper extends Scraper {
 		 
 	}
 	
-	public void waitNextScrap(int i) throws InterruptedException
+	public void waitNextScrap(int i)
 	{
 		if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("us")==0)
-			TimeUnit.MICROSECONDS.sleep(period(i-1)-(endTime - startTime));
+			try {
+				TimeUnit.MICROSECONDS.sleep(period(i-1)-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else {
 			
 		if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("ms")==0)
-		 TimeUnit.MILLISECONDS.sleep(period(i-1)-(endTime - startTime));
+			try {
+				TimeUnit.MILLISECONDS.sleep(period(i-1)-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else {if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("s")==0)
-			TimeUnit.SECONDS.sleep(period(i-1)-(endTime - startTime));
+			try {
+				TimeUnit.SECONDS.sleep(period(i-1)-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else {if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("min")==0)
-			 TimeUnit.MINUTES.sleep(period(i-1)-(endTime - startTime));
+			try {
+				TimeUnit.MINUTES.sleep(period(i-1)-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else {if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("h")==0)
-			TimeUnit.HOURS.sleep(period(i-1)-(endTime - startTime));
+			try {
+				TimeUnit.HOURS.sleep(period(i-1)-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		else
-			TimeUnit.DAYS.sleep(period(i-1)-(endTime - startTime));
+			try {
+				TimeUnit.DAYS.sleep(period(i-1)-(endTime - startTime));
+			} catch (InterruptedException e) {
+				
+			}
 		}}}}
 		
 	}

@@ -5,7 +5,10 @@
 
 import Tasks.*;
 
-public class Analyseur{}PARSER_END(Analyseur)SKIP :
+public class Analyseur{
+private  int idCounter = 0;
+
+}PARSER_END(Analyseur)SKIP :
 {
   " "
 | "\r"
@@ -84,13 +87,14 @@ CreateNotifier CreateNotifierResource():{
 Token tok1= null;
 CreateNotifier task = new CreateNotifier();} {
 
-<createN>tok1=<Id>{task.setNotifierId(tok1.toString());}<operateur>tok1=<MetricName> {task.getExpression().add(tok1.toString());task.getMetrics().add(tok1.toString());}
+<createN>{task.setId("notifier"+idCounter); idCounter++;}<operateur>tok1=<MetricName> {task.getExpression().add(tok1.toString());task.getMetrics().add(tok1.toString());}
 (tok1=<operateur> { task.getExpression().add(tok1.toString());}(tok1=<number> { task.getExpression().add(tok1.toString());}|tok1=<MetricName> {task.getExpression().add(tok1.toString());task.getMetrics().add(tok1.toString());} ))+
  <grammarkeyWords>tok1=<url> { task.setUrl(tok1.toString());} 
  {return task; } }
 
 
-
+// we can read the value of admin metric(global metric) or internal metric ,
+// a get operation on internal metric enables it if it was disabled.
 ReadMonitor ReadMonitoringResource():{
 Token tok1= null;
 ReadMonitor task = new ReadMonitor();} {
@@ -108,7 +112,7 @@ CreateMonitor CreateMonitoringResource(): {
   RTT rtt= new RTT();
   String [] input;}
   {
-     <createM><grammarkeyWords>tok1=<MetricName> {task.getAdminmetric().setMetricName(tok1.toString());}
+     <createM><grammarkeyWords>tok1=<MetricName> {task.getAdminmetric().setMetricName(tok1.toString()); task.setId(tok1.toString());}
     <operateur>
 
     ((tok1=<number> {task.getExpression().add(tok1.toString());}|(tok1=<Id> {counter.setIdMs(tok1.toString());
