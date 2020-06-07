@@ -181,7 +181,6 @@ ReadMonitor task = new ReadMonitor();
   CreateMonitor task= new CreateMonitor();
   Counter counter = new Counter();
   RTT rtt= new RTT();
-  String [] input;
     jj_consume_token(createM);
     jj_consume_token(grammarkeyWords);
     tok1 = jj_consume_token(MetricName);

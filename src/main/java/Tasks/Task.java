@@ -12,4 +12,12 @@ public abstract class Task {
 	}
 
 	
+	public boolean equals(Object obj) {
+	    if (obj instanceof Task) {
+	         Task o = (Task) obj;
+	        return (o.id.compareTo(this.id)==0);
+	    }
+	    return false;
+	}
+	
 }

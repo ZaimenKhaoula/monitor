@@ -17,7 +17,7 @@ public class MonitoringManager  {
 	private static ArrayList<AdminMetric> metricsCurrentValues= new ArrayList<AdminMetric>() ;
 	Map<String,AlertGenerator> currentAlertGenerators; 
 	private ArrayList<Task> currentTasks;
-	private ArrayList<String> activeInternalMetrics=new ArrayList<String>();
+	private ArrayList<String> activeInternalMetrics;
 	ScheduledExecutorService executor;
 
 	public MonitoringManager() {
@@ -26,7 +26,7 @@ public class MonitoringManager  {
 		currentAlertGenerators =new HashMap<String,AlertGenerator>();
 		currentTasks= new ArrayList<Task>();
 		MonitoredMetrics =new HashMap<String,Scraper>();
-		
+		activeInternalMetrics=new ArrayList<String>();
 		
 	}
 
@@ -66,7 +66,7 @@ public class MonitoringManager  {
 		// stop monitoring task
         if(t instanceof DeleteMonitor) {
         		if (MonitoredMetrics.containsKey(((DeleteMonitor) t).getId()) ) {(MonitoredMetrics.get(((DeleteMonitor) t).getId())).cancelScraping();
-        		currentTasks.remove(((DeleteMonitor) t).getId());
+        		 currentTasks.remove((DeleteMonitor) t);
         		MonitoredMetrics.remove(((DeleteMonitor) t).getId());}
        
 		}

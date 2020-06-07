@@ -109,8 +109,7 @@ CreateMonitor CreateMonitoringResource(): {
   Token tok2 =null;
   CreateMonitor task= new CreateMonitor();
   Counter counter = new Counter();
-  RTT rtt= new RTT();
-  String [] input;}
+  RTT rtt= new RTT();}
   {
      <createM><grammarkeyWords>tok1=<MetricName> {task.getAdminmetric().setMetricName(tok1.toString()); task.setId(tok1.toString());}
     <operateur>

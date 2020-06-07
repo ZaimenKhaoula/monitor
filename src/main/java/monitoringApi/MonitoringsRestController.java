@@ -3,6 +3,7 @@ package monitoringApi;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,13 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.github.fge.jsonpatch.JsonPatch;
-
 import Monitoring.MonitoringManager;
 import TaskGeneration.ParseException;
 import TaskGeneration.Analyseur;
@@ -63,24 +60,15 @@ public class MonitoringsRestController {
 		
 	}
 	
-	@PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
-public void updateoMonitoringTask(@PathVariable String id, @RequestBody JsonPatch patch) throws InterruptedException, ParseException {
-		
-		/*operation="UpdateMonitor"+MetricName+newRate.toString();
-		is = new ByteArrayInputStream(operation.getBytes());
-		if (parser==null) parser= new Analyseur(is); 
-		else parser.ReInit(is);
-		monitorManager.taskProccessing(parser.UpdateMonitoringResource());*/
-		
-	}
-	@PutMapping("/monitorings/{MetricName}")
-	public void updateMonitoringTask(@PathVariable String MetricName ,@RequestBody RateModel newRate) throws InterruptedException, ParseException {
+	
+	@PatchMapping("/monitorings/{MetricName}")
+	public void updateMonitoringTask(@PathVariable String MetricName ,@RequestBody RateModel newRate){
 		
 		operation="UpdateMonitor"+MetricName+newRate.toString();
 		is = new ByteArrayInputStream(operation.getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
-		monitorManager.taskProccessing(parser.UpdateMonitoringResource());
+		//monitorManager.taskProccessing(parser.UpdateMonitoringResource());
 		
 	}
 	
