@@ -1,22 +1,57 @@
 package Monitoring;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MonitoringMessage {
  
-	
-  //oerations set to do on internal metrics
-  private	Map<OperationType,String> orders =new HashMap<OperationType,String>();
+	private OperationType op;
+	private String metricName;
+	private String metricType;
+	private String urlDesMs="";
 
-public Map<OperationType,String> getOrders() {
-	return orders;
+@Override
+public String toString() {
+
+	return metricType+"-"+op+"-"+metricType+"-"+urlDesMs;
 }
 
-public void setOrders(Map<OperationType,String> orders) {
-	this.orders = orders;
+
+
+public OperationType getOp() {
+	return op;
 }
 
 
+public void setOp(OperationType op) {
+	this.op = op;
+}
+
+
+public String getMetricName() {
+	return metricName;
+}
+
+
+public void setMetricName(String metricName) {
+	this.metricName = metricName;
+}
+
+
+public String getMetricType() {
+	return metricType;
+}
+
+
+public void setMetricType(String metricType) {
+	this.metricType = metricType;
+}
+
+
+public String getUrlDesMs() {
+	return urlDesMs;
+}
+
+
+public void setUrlDesMs(String urlDesMs) {
+	this.urlDesMs = urlDesMs;
+}
 	
 }

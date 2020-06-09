@@ -39,17 +39,21 @@ import pfe.mw.models.Status;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import Monitoring.MonitoringMessage;
+
 public class NCEM {
 	private String id;
 	private String repSocketURL;
 	private String pubSocketURL;
 	private NodeComponent nc;
-
+    private Map<String, String> MsIdAndURL =new HashMap<String,String>();
 	String UPLOADED_FOLDER = "";
 	String NODE_ROUTER_IP_ADDRESS;
 	// variable made static in order to be accessed by all NCEM instances
 	static String MAIN_ROUTER_IP_ADDRESS = "";
-
+    // variables used to contact MSs
+    ZContext contextUsedToContactMs;
+    ZMQ.Socket reqSocketUsedToContactMS;
 	@Transient
 	ZContext context;
 	@Transient
@@ -132,6 +136,7 @@ public class NCEM {
 									+ nc.getRouter().getPubSubRouterBackendURL()+"-tcp://" + MsAdresseIp + ":2225";
 							System.out.println(">>> " + response);
 							socket.send(response.getBytes(ZMQ.CHARSET), 0);
+							MsIdAndURL.put(id, "tcp://\" + MsAdresseIp + \":2225\"");
 							updateRouter();
 						}
 					}
@@ -625,4 +630,25 @@ public class NCEM {
 	public void setId(String id) {
 		this.id = id;
 	}
+
+	public Map<String, String> getMsIdAndURL() {
+		return MsIdAndURL;
+	}
+
+	public void setMsIdAndURL(Map<String, String> msIdAndURL) {
+		MsIdAndURL = msIdAndURL;
+	}
+
+	public String sendMonitoringMsg(String des, String msg) {
+		reqSocketUsedToContactMS = contextUsedToContactMs.createSocket(SocketType.REQ);
+		reqSocketUsedToContactMS.connect(MsIdAndURL.get(des));
+		String replyFromMS=null;
+		while (replyFromMS == null) {
+			reqSocketUsedToContactMS.sendMore("ncem");
+			reqSocketUsedToContactMS.send(msg);
+			replyFromMS = reqSocketUsedToContactMS.recvStr(0);
+			
+	}
+		return replyFromMS;
+}
 }

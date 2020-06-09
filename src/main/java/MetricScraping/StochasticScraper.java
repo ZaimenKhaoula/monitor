@@ -6,44 +6,40 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
+import Monitoring.MonitoringMessage;
+import Monitoring.OperationType;
 import Tasks.*;
+import pfe.mw.models.NCEM;
 
 public class StochasticScraper extends Scraper{
 	long startTime;
 	long endTime;
 	
     Future<?> future;
-	private Runnable scrap;
-	CreateMonitor t = new CreateMonitor();
+	private Runnable scraper;
 	private final ScheduledExecutorService runner;
 	
 	//constructeur de StochasticScraper... puisque la fonction run ne change pas on peut la mettre dans le consucteur
 	public StochasticScraper(ScheduledExecutorService runner, Task t) {
 		this.runner=runner;
 		setEnable(true);
-		this.t=(CreateMonitor)t;
-		scrap = new Runnable()
-	    {
-	        
+		this.task=(CreateMonitor)t;
+		scraper = new Runnable()
+	    {	        
 	        public void run()
-	        {	
-	        	//recupere le nom de l'app et pour chaque microservice trouver
-	        	//le ncem adequat, l'utilieser pour contacter les microservice par msg de 
-	        	//monitorig, attendre la reponse de ts les ncem, met à jr les valeurs des mitrique
-	        	//preparer l'exppresion et l'evaluer, enfin sauvegarger la nouvelle valeur dans le 
-	        	System.out.println("scaring....");
-	        }
-	
-	
-	         
+	        {
+	        	getAllInternalMetricsValueOfTheAdminValue();
+	        }         
 	    };
 	}
 	 
 
 	
 	// fonction pour evaluer l'expression ( la règle d'alerte) 
-	public void evaluateExression() {}
+	public void evaluateExression() {
+		
+		
+	}
 	public void saveValue() {}
 	
 	public void scrap(){
@@ -51,16 +47,17 @@ public class StochasticScraper extends Scraper{
 		
 		 while(isEnable()==true) {
 			 startTime = System.currentTimeMillis();
-			 future= runner.submit(scrap);
-			 endTime = System.currentTimeMillis();
-			 System.out.println(endTime);
+			 future= runner.submit(scraper);
+
 		
 				try {
 					future.get();
 				} catch (InterruptedException | ExecutionException e) {
 					
 				} 
-
+                    evaluateExression();
+                    saveValue();
+       			    endTime = System.currentTimeMillis();
 					waitNextScrap();
 				
 			}	 
@@ -68,53 +65,65 @@ public class StochasticScraper extends Scraper{
    }
 	
 	public long period() {
-         String period= ((StochasticRate) (t.getRate())).getParameters().get(0);
-		 if(((StochasticRate) (t.getRate())).getLoi()=="uniform")
+         String period= ((StochasticRate) (task.getRate())).getParameters().get(0);
+		 if(((StochasticRate) (task.getRate())).getLoi()=="uniform")
 		      return (long) (Math.random()*Long.parseLong(period));	 
 		 else /*(((StochasticRate) (t.getRate())).getLoi()=="exponential")*/
 	   	  		
-			return (long) ((-Math.log(Math.random()))/Double.parseDouble("0.1"));	 
+			return (long) ((-Math.log(Math.random()))/Double.parseDouble((task.getRate()).getParameters().get(0)));	 
 
 	}
 	
 	
 	public void waitNextScrap()
 	{
-		if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("us")==0)
+		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("us")==0)
 			try {
-				TimeUnit.MICROSECONDS.sleep(period()-(endTime - startTime));
+				if((endTime - startTime)*1000>period())
+					TimeUnit.MILLISECONDS.sleep(0);
+				else
+				TimeUnit.MICROSECONDS.sleep(period()-(endTime - startTime)*1000);
 			} catch (InterruptedException e) {
 				
 			}
 		else {
 			
-		if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("ms")==0)
+		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("ms")==0)
 			try {
+			if((endTime - startTime)>period())
+				TimeUnit.MILLISECONDS.sleep(0);
+			else
 				TimeUnit.MILLISECONDS.sleep(period()-(endTime - startTime));
 			} catch (InterruptedException e) {
 
 			}
-		else {if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("s")==0)
+		else {if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("s")==0)
 			try {
-				TimeUnit.SECONDS.sleep(period()-(endTime - startTime));
+				if((endTime - startTime)/1000>period())
+					TimeUnit.MILLISECONDS.sleep(0);
+				else
+				TimeUnit.SECONDS.sleep(period()-(endTime - startTime)/1000);
 			} catch (InterruptedException e) {
 				
 			}
-		else {if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("min")==0)
+		else {if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("min")==0)
 			try {
-				TimeUnit.MINUTES.sleep(period()-(endTime - startTime));
+				if((endTime - startTime)/60000>period())
+					TimeUnit.MILLISECONDS.sleep(0);
+				else
+				TimeUnit.MINUTES.sleep(period()-(endTime - startTime)/60000);
 			} catch (InterruptedException e) {
 				
 			}
-		else {if(((StochasticRate)(t.getRate())).getParameters().get(1).compareTo("h")==0)
+		else {if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("h")==0)
 			try {
-				TimeUnit.HOURS.sleep(period()-(endTime - startTime));
+				TimeUnit.HOURS.sleep(period());
 			} catch (InterruptedException e) {
 				
 			}
 		else
 			try {
-				TimeUnit.DAYS.sleep(period()-(endTime - startTime));
+				TimeUnit.DAYS.sleep(period());
 			} catch (InterruptedException e) {
 				
 			}

@@ -7,6 +7,9 @@ public class CreateMonitor extends Task{
 	 private ArrayList<String> expression;
 	private AdminMetric adminmetric;
 	
+	public void setAdminmetric(AdminMetric adminmetric) {
+		this.adminmetric = adminmetric;
+	}
 	private Rate rate;
 	
 	public CreateMonitor() {
@@ -38,9 +41,7 @@ public class CreateMonitor extends Task{
 	public AdminMetric getAdminmetric() {
 		return adminmetric;
 	}
-	public void setAdminmetric(AdminMetric adminmetric) {
-		this.adminmetric = adminmetric;
-	}
+	
 	
 	
 }

@@ -248,7 +248,8 @@ public class MonitoringManager  {
 	
 	public void sendMonitoringMessage(String dest, OperationType op, String internalMetric) {
 	MonitoringMessage msg= new MonitoringMessage();
-    msg.getOrders().put(op, internalMetric);
+    msg.setOp(op);
+    msg.setMetricName(internalMetric);
 	}
 	
 	

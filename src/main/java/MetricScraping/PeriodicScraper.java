@@ -11,12 +11,11 @@ public class PeriodicScraper extends  Scraper {
 	private final ScheduledExecutorService executor;
 	private Runnable scrap;
 	ScheduledFuture<?> futureTask;
-	CreateMonitor t = new CreateMonitor();
 	public PeriodicScraper(ScheduledExecutorService executor, Task t) {
 		this.executor=executor;
 	    setEnable(true);
 	
-		this.t=(CreateMonitor)t;
+		this.task=(CreateMonitor)t;
 		scrap = new Runnable()
 	    {
 	        
@@ -46,23 +45,23 @@ public class PeriodicScraper extends  Scraper {
 	
 	}
 	public long period() {
-      return Long.parseLong(((PeriodicRate)(t.getRate())).getParameters().get(0));
+      return Long.parseLong(((PeriodicRate)(task.getRate())).getParameters().get(0));
 		 
 	}
 	
 	public TimeUnit unit()
 	{
-		if(((PeriodicRate)(t.getRate())).getParameters().get(1).compareTo("us")==0)
+		if(((PeriodicRate)(task.getRate())).getParameters().get(1).compareTo("us")==0)
 			return TimeUnit.MICROSECONDS;
 		else {
 			
-		if(((PeriodicRate)(t.getRate())).getParameters().get(1).compareTo("ms")==0)
+		if(((PeriodicRate)(task.getRate())).getParameters().get(1).compareTo("ms")==0)
 		return TimeUnit.MILLISECONDS;
-		else {if(((PeriodicRate)(t.getRate())).getParameters().get(1).compareTo("s")==0)
+		else {if(((PeriodicRate)(task.getRate())).getParameters().get(1).compareTo("s")==0)
 			return TimeUnit.SECONDS;
-		else {if(((PeriodicRate)(t.getRate())).getParameters().get(1).compareTo("min")==0)
+		else {if(((PeriodicRate)(task.getRate())).getParameters().get(1).compareTo("min")==0)
 			return TimeUnit.MINUTES;
-		else {if(((PeriodicRate)(t.getRate())).getParameters().get(1).compareTo("h")==0)
+		else {if(((PeriodicRate)(task.getRate())).getParameters().get(1).compareTo("h")==0)
 			return TimeUnit.HOURS;
 		else
 			return TimeUnit.DAYS;

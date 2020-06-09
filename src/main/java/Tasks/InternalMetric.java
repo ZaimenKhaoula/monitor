@@ -3,13 +3,13 @@ package Tasks;
 public abstract class InternalMetric {
 	 
 	private String appName;
+
+	private float Value;
 	
-	private int Value;
-	
-		public int getValue() {
+		public float getValue() {
 		return Value;
 	}
-	public void setValue(int value) {
+	public void setValue(float value) {
 		Value = value;
 	}
 	public String getAppName() {
@@ -18,5 +18,6 @@ public abstract class InternalMetric {
 	public void setAppName(String appName) {
 		this.appName = appName;
 	}
+	
 	
 }

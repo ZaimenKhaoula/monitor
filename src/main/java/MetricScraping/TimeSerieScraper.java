@@ -15,11 +15,11 @@ public class TimeSerieScraper extends Scraper {
     Future<?> future;
     private final ScheduledExecutorService runner;
 	private Runnable scrap;
-	CreateMonitor t = new CreateMonitor();
+
 	public TimeSerieScraper(ScheduledExecutorService runner, Task t) {
 		this.runner=runner;
 		setEnable(true);
-		this.t=(CreateMonitor)t;
+		this.task=(CreateMonitor)t;
 		scrap = new Runnable()
 	    {
 	        
@@ -59,7 +59,7 @@ public class TimeSerieScraper extends Scraper {
 		
 		 int i=1;
 		
-		 while(isEnable()==true && i<(((TimeSerieRate)(t.getRate())).getParameters()).size()) {
+		 while(isEnable()==true && i<(((TimeSerieRate)(task.getRate())).getParameters()).size()) {
 			 
 			 startTime = System.currentTimeMillis();
 			 future= runner.submit(scrap);
@@ -80,13 +80,13 @@ public class TimeSerieScraper extends Scraper {
 	
 	public long period(int i) {
 		
-        return (long) (Long.parseLong(((TimeSerieRate) (t.getRate())).getParameters().get(i)));
+        return (long) (Long.parseLong(((TimeSerieRate) (task.getRate())).getParameters().get(i)));
 		 
 	}
 	
 	public void waitNextScrap(int i)
 	{
-		if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("us")==0)
+		if(((TimeSerieRate)(task.getRate())).getParameters().get(1).compareTo("us")==0)
 			try {
 				TimeUnit.MICROSECONDS.sleep(period(i-1)-(endTime - startTime));
 			} catch (InterruptedException e) {
@@ -94,25 +94,25 @@ public class TimeSerieScraper extends Scraper {
 			}
 		else {
 			
-		if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("ms")==0)
+		if(((TimeSerieRate)(task.getRate())).getParameters().get(1).compareTo("ms")==0)
 			try {
 				TimeUnit.MILLISECONDS.sleep(period(i-1)-(endTime - startTime));
 			} catch (InterruptedException e) {
 				
 			}
-		else {if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("s")==0)
+		else {if(((TimeSerieRate)(task.getRate())).getParameters().get(1).compareTo("s")==0)
 			try {
 				TimeUnit.SECONDS.sleep(period(i-1)-(endTime - startTime));
 			} catch (InterruptedException e) {
 				
 			}
-		else {if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("min")==0)
+		else {if(((TimeSerieRate)(task.getRate())).getParameters().get(1).compareTo("min")==0)
 			try {
 				TimeUnit.MINUTES.sleep(period(i-1)-(endTime - startTime));
 			} catch (InterruptedException e) {
 				
 			}
-		else {if(((TimeSerieRate)(t.getRate())).getParameters().get(1).compareTo("h")==0)
+		else {if(((TimeSerieRate)(task.getRate())).getParameters().get(1).compareTo("h")==0)
 			try {
 				TimeUnit.HOURS.sleep(period(i-1)-(endTime - startTime));
 			} catch (InterruptedException e) {
