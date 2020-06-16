@@ -76,6 +76,7 @@ public class AlertGenerator implements PropertyChangeListener {
 	while (!found && i<metrics.size() ) {
 		if((metrics.get(i)).getMetricName().compareTo(notifier.getMetrics().get(0))==0) {
 			a.setType(metrics.get(i).getType());
+			a.setAlertExpression(notifier.expressionToString());
 			a.getMetrics().add(metrics.get(i));
 			found=true;}
 		i++; 

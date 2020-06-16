@@ -575,10 +575,12 @@ ReadMonitor task = new ReadMonitor();
       tok1 = jj_consume_token(periodic);
                      task.createRate(tok1.toString());
       jj_consume_token(grammarkeyWords);
+      jj_consume_token(accoladO);
       tok2 = jj_consume_token(number);
-                                                                                        System.out.println(tok2.toString());task.getRate().getParameters().add(tok2.toString());
+                                                                                                  System.out.println(tok2.toString());task.getRate().getParameters().add(tok2.toString());
       tok2 = jj_consume_token(timeUnit);
-                                                                                                                                                                                                   System.out.println(tok2.toString());task.getRate().getParameters().add(tok2.toString());
+                                                                                                                                                                                                             System.out.println(tok2.toString());task.getRate().getParameters().add(tok2.toString());
+      jj_consume_token(accoladF);
       break;
     case stochastic:
       tok1 = jj_consume_token(stochastic);

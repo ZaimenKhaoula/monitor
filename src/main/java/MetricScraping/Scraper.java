@@ -2,6 +2,7 @@ package MetricScraping;
 
 
 
+import org.mariuszgromada.math.mxparser.Expression;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import Monitoring.MonitoringMessage;
@@ -118,9 +119,76 @@ public abstract class Scraper{
        }
 		return null;
 	}
+
+	
+	private String replaceMetricByValue(String s) {
+	
+		int i;
+	 if(s.contains("NbReqSent")||s.contains("NbRespSent")||s.contains("NBTopicSubscription")||s.contains("NbPublishedMsg")) 
+	 {
+		 String[] input= s.split("\\.");
+		 i=0;
+		 while( i<task.getAdminmetric().getMetrics().size()) {
+			
+			if(input[0].compareTo(((Counter)task.getAdminmetric().getMetrics().get(i)).getIdMs())==0 &&
+           input[1].compareTo(((Counter)task.getAdminmetric().getMetrics().get(i)).getMetricName())==0) {
+				return String.valueOf(((Counter)task.getAdminmetric().getMetrics().get(i)).getValue());}
+		i++;	
+		 }
+		 
+	 }
+	 else {
+
+		 String[] input= s.split("-");
+		 i=0;
+		 while( i<task.getAdminmetric().getMetrics().size()) {
+				
+				if(input[1].compareTo(((RTT)task.getAdminmetric().getMetrics().get(i)).getIDusSource())==0 &&
+	           input[2].compareTo(((RTT)task.getAdminmetric().getMetrics().get(i)).getIDusDestination())==0) {
+					return String.valueOf(((RTT)task.getAdminmetric().getMetrics().get(i)).getValue());}
+			i++;	
+			 }
+		 
+	 }
+		 
+		
+		return null;
+		
+		
+	}
 	
 	
-	public 
+	
+	
+	
+	
+	
+public String prepareExpression() {
+		
+		String result="";
+		
+		for(String s: task.getExpression()) {
+			if(s.contains("RTT")|| s.contains("NbReqSent")||s.contains("NbRespSent")||s.contains("NBTopicSubscription")||s.contains("NbPublishedMsg"))
+			 {
+				result=result+replaceMetricByValue(s);
+			 }
+			
+			else {
+				result=result+s;
+			}
+		}
+		
+		System.out.println(result);
+		return result; 
+	}
+
+public double evaluateExpression(){
+	
+	Expression e = new Expression(prepareExpression());
+	task.getAdminmetric().setValue(e.calculate());
+	return e.calculate();
+	
+}
 	
 	
 }

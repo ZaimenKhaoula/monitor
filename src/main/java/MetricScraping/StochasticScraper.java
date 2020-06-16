@@ -6,10 +6,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import Monitoring.MonitoringMessage;
-import Monitoring.OperationType;
+
 import Tasks.*;
-import pfe.mw.models.NCEM;
+
 
 public class StochasticScraper extends Scraper{
 	long startTime;
@@ -35,12 +34,7 @@ public class StochasticScraper extends Scraper{
 	 
 
 	
-	// fonction pour evaluer l'expression ( la règle d'alerte) 
-	public void evaluateExression() {
-		
-		
-	}
-	public void saveValue() {}
+
 	
 	public void scrap(){
 

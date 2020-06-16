@@ -35,15 +35,9 @@ public class TimeSerieScraper extends Scraper {
 	    };
 	}
 	
-	public void evaluateExression() {}
-	
-	public void saveValue() {}
-	
-	
-	
 	public void scrap()  {
 		
-		boolean repeat = (((TimeSerieRate)(t.getRate())).getParameters()).contains("loop");
+		boolean repeat = (((TimeSerieRate)(task.getRate())).getParameters()).contains("loop");
 		System.out.println(repeat);
 		 do	{
 			 oneTimeScraping() ;

@@ -31,9 +31,18 @@ public class CreateNotifier extends Task{
 	public void setUrl(String url) {
 		this.url = url;
 	}
+	
+	
+	public String expressionToString() {
+		String s="";
+		for(String st: expression ) {
+			s=s+st;
+		}
+		return s;
+	}
 	@Override
 	public String toString() {
-		return id+" expression :"+expression+" AlertUrl :"+url;
+		return id+" expression :"+expressionToString()+" AlertUrl :"+url;
 		
 	}
 	

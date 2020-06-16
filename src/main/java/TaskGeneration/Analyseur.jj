@@ -153,7 +153,7 @@ CreateMonitor CreateMonitoringResource(): {
     )<separateur>
 
      <grammarkeyWords><operateur><grammarkeyWords> 
-    (tok1=<periodic>{task.createRate(tok1.toString());}<grammarkeyWords>tok2=<number> { System.out.println(tok2.toString());task.getRate().getParameters().add(tok2.toString());}tok2=<timeUnit> { System.out.println(tok2.toString());task.getRate().getParameters().add(tok2.toString());}
+    (tok1=<periodic>{task.createRate(tok1.toString());}<grammarkeyWords><accoladO>tok2=<number> { System.out.println(tok2.toString());task.getRate().getParameters().add(tok2.toString());}tok2=<timeUnit> { System.out.println(tok2.toString());task.getRate().getParameters().add(tok2.toString());}<accoladF>
 |  tok1=<stochastic>{task.createRate(tok1.toString());}
 <grammarkeyWords><accoladO>tok2=<loi > { ((StochasticRate)(task.getRate())).setLoi( tok2.toString());}(tok2=<number> { task.getRate().getParameters().add(tok2.toString());}tok2=<timeUnit> { task.getRate().getParameters().add(tok2.toString());})+<accoladF>
 | tok1=<time_serie>{task.createRate(tok1.toString());}

@@ -32,8 +32,7 @@ public class PeriodicScraper extends  Scraper {
 	    };
 	}
 	
-	public void evaluateExression() {}
-	public void saveValue() {}
+
 	public void scrap() {
 		
 		

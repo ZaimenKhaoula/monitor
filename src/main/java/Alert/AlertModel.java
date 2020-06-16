@@ -7,14 +7,14 @@ import Tasks.*;
 public class AlertModel {
 
 private String type;
-private String AlertExression;
+private String AlertExpression;
 private ArrayList<AdminMetric> metrics= new ArrayList<AdminMetric>();
 
 public String getAlertExression() {
-	return AlertExression;
+	return AlertExpression;
 }
-public void setAlertExression(String alertExression) {
-	AlertExression = alertExression;
+public void setAlertExpression(String alertExpression) {
+	AlertExpression = alertExpression;
 }
 public String getType() {
 	return type;
@@ -38,7 +38,7 @@ public String toString() {
 	metric=metric+m.toString()+"-";
 	}
 
-	return "Alert-"+type+"-"+AlertExression+"-"+metric;
+	return "Alert-"+type+"-"+AlertExpression+"-"+metric;
 	
 }
 
