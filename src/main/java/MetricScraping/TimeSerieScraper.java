@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import java.util.concurrent.TimeUnit;
 
+import org.influxdb.InfluxDB;
 
 import Tasks.*;
 
@@ -13,26 +14,9 @@ public class TimeSerieScraper extends Scraper {
 	long startTime;
 	long endTime;
     Future<?> future;
-    private final ScheduledExecutorService runner;
-	private Runnable scrap;
-
-	public TimeSerieScraper(ScheduledExecutorService runner, Task t) {
-		this.runner=runner;
-		setEnable(true);
-		this.task=(CreateMonitor)t;
-		scrap = new Runnable()
-	    {
-	        
-	        public void run()
-	        
-	        {	System.out.println(System.currentTimeMillis()/1000);
-	        	System.out.println("scraping");
-	        
-	    }
-	
-	
-	         
-	    };
+    
+	public TimeSerieScraper(ScheduledExecutorService runner, Task t,InfluxDB influxDB ) {
+		super(runner,t,influxDB);	
 	}
 	
 	public void scrap()  {
@@ -44,8 +28,6 @@ public class TimeSerieScraper extends Scraper {
 			 
 		 }while(repeat);
 		 
-		 
-		 System.out.println("finished");	 
 	 
   }
 	

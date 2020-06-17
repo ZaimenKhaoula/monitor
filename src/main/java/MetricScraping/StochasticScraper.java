@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.influxdb.InfluxDB;
 
 import Tasks.*;
 
@@ -15,21 +16,11 @@ public class StochasticScraper extends Scraper{
 	long endTime;
 	
     Future<?> future;
-	private Runnable scraper;
-	private final ScheduledExecutorService runner;
 	
 	//constructeur de StochasticScraper... puisque la fonction run ne change pas on peut la mettre dans le consucteur
-	public StochasticScraper(ScheduledExecutorService runner, Task t) {
-		this.runner=runner;
-		setEnable(true);
-		this.task=(CreateMonitor)t;
-		scraper = new Runnable()
-	    {	        
-	        public void run()
-	        {
-	        	getAllInternalMetricsValueOfTheAdminValue();
-	        }         
-	    };
+	public StochasticScraper(ScheduledExecutorService runner, Task t,InfluxDB influxDB) {
+		super(runner, t, influxDB);
+		
 	}
 	 
 
@@ -41,7 +32,7 @@ public class StochasticScraper extends Scraper{
 		
 		 while(isEnable()==true) {
 			 startTime = System.currentTimeMillis();
-			 future= runner.submit(scraper);
+			 future= runner.submit(scrap);
 
 		
 				try {

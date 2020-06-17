@@ -5,39 +5,22 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.influxdb.InfluxDB;
+
 import Tasks.*;
 
 public class PeriodicScraper extends  Scraper {
-	private final ScheduledExecutorService executor;
-	private Runnable scrap;
 	ScheduledFuture<?> futureTask;
-	public PeriodicScraper(ScheduledExecutorService executor, Task t) {
-		this.executor=executor;
-	    setEnable(true);
-	
-		this.task=(CreateMonitor)t;
-		scrap = new Runnable()
-	    {
-	        
-	        public void run()
-	        {	
-	        	System.out.println("period");
-	        	//period();
-	        	
-	        	System.out.println((System.currentTimeMillis())/1000);
-	    }
-	
-	
-	         
-	    };
+	public PeriodicScraper(ScheduledExecutorService executor, Task t,InfluxDB influxDB) {
+		super(executor,t,influxDB);
+		
 	}
 	
 
 	public void scrap() {
 		
-		
-		     if(isEnable())
-			futureTask = executor.scheduleAtFixedRate(scrap,0,period(), TimeUnit.MICROSECONDS);
+			if(isEnable())
+			futureTask = runner.scheduleAtFixedRate(scrap,0,period(), TimeUnit.MICROSECONDS);
 		   
 		  
 		

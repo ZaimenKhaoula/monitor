@@ -2,6 +2,11 @@ package MetricScraping;
 
 
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.influxdb.InfluxDB;
+import org.influxdb.dto.Point;
 import org.mariuszgromada.math.mxparser.Expression;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,18 +16,37 @@ import Tasks.Counter;
 import Tasks.CreateMonitor;
 import Tasks.InternalMetric;
 import Tasks.RTT;
+import Tasks.Task;
 import pfe.mw.models.Application;
 import pfe.mw.models.ApplicationRepository;
 import pfe.mw.models.NCEM;
 
 public abstract class Scraper{
+	
 
 	protected boolean enable=false;
 	protected CreateMonitor task = new CreateMonitor();
 	 @Autowired
 	protected ApplicationRepository appRepository;
-		
-	public void scrap() throws InterruptedException{
+	protected InfluxDB influxDB;
+	protected final ScheduledExecutorService runner;
+	protected Runnable scrap;
+	 
+	 public Scraper(ScheduledExecutorService runner, Task t,InfluxDB influxDB) {
+		 this.influxDB=influxDB;
+		 this.influxDB.setDatabase("metricdb");
+		 this.runner=runner;
+	     setEnable(true);
+	     this.task=(CreateMonitor)t;
+	     scrap = new Runnable()
+		    {	        
+		        public void run()
+		        {
+		        	getAllInternalMetricsValueOfTheAdminValue();
+		        }         
+		    };
+	 }
+	public void scrap(){
 		
 	}
 	
@@ -49,7 +73,8 @@ public abstract class Scraper{
                    ncem =findNcemToContactMS(((RTT) m).getIDusSource(),((RTT) m).getAppName());
   	    	}
       	    
-      	    
+      	    if(ncem== null) System.out.println("ncem not found");
+      	    else
       	    m.setValue(Float.parseFloat(ncem.sendMonitoringMsg(des,msg.toString())));
       	    }
 	}
@@ -89,10 +114,20 @@ public abstract class Scraper{
 	public void setEnable(boolean enable) {
 		this.enable = enable;
 	}
-	public void saveValue() {}
+	public void saveValue() {
+		
+		Point point = Point.measurement("metrics")
+				  .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+				  .tag("name", task.getAdminmetric().getMetricName())
+				  .addField("type", task.getAdminmetric().getType())
+				  .addField("value", task.getAdminmetric().getValue()) 
+				  .build();
+		influxDB.write("metricdb", "autogen", point);
+		
+		
+	}
 	
 	
-	public void evaluateExression() {}
 	public void cancelScraping() {}
 
 

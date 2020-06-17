@@ -31,6 +31,11 @@ public void setMetrics(ArrayList<AdminMetric> metrics) {
 
 
 // save the alert as string in the knowledge base
+
+public String alertInfo(){
+	return "Alert-"+type+"-"+AlertExpression;
+}
+
 @Override
 public String toString() {
 	 String metric ="";
@@ -38,9 +43,10 @@ public String toString() {
 	metric=metric+m.toString()+"-";
 	}
 
-	return "Alert-"+type+"-"+AlertExpression+"-"+metric;
+	return alertInfo()+"-"+metric;
 	
 }
+
 
 
 }

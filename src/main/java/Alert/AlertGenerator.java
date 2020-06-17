@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import java.util.ArrayList;
-
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 
@@ -16,6 +16,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBFactory;
+import org.influxdb.dto.Point;
+import org.influxdb.dto.Query;
 import org.json.JSONObject;
 import org.mariuszgromada.math.mxparser.Expression;
 
@@ -28,16 +32,16 @@ public class AlertGenerator implements PropertyChangeListener {
     
 	 private Boolean enable=true;
 	 private ArrayList<AdminMetric> metrics;
-	 
+	 InfluxDB influxDB; 
 
-
+  
 
 	CreateNotifier notifier= new CreateNotifier();
-	 public AlertGenerator(CreateNotifier t) {
-		 
+	 public AlertGenerator(CreateNotifier t, InfluxDB influxDB) {
+		 this.influxDB=influxDB;
 		this.notifier=t;
 		 metrics = new ArrayList<AdminMetric>();
-		
+		 this.influxDB.setDatabase("alertdb");
 	 }
 	 public ArrayList<AdminMetric> getMetrics() {
 			return metrics;
@@ -82,13 +86,16 @@ public class AlertGenerator implements PropertyChangeListener {
 		i++; 
 	}
 	
-	System.out.println("alerte generee");}}
+	Point point = Point.measurement("alerts")
+			  .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+			  .addField("name", notifier.getId()) 
+			  .addField("value", a.toString()) 
+			  .build();
+	influxDB.write("alertdb", "autogen", point);
+		}}
+	 sendAlert();
 	}
-	
-	
-
-	
-	
+		
 	
 	public void propertyChange(PropertyChangeEvent evt) {
 		if(isEnable()) {

@@ -2,14 +2,25 @@ package Monitoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBFactory;
+import org.influxdb.dto.Query;
+import org.influxdb.dto.QueryResult;
+import org.influxdb.impl.InfluxDBResultMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import Alert.AlertGenerator;
 import MetricScraping.*;
 import Tasks.*;
+import pfe.mw.models.Application;
+import pfe.mw.models.ApplicationRepository;
+import pfe.mw.models.NCEM;
 
 public class MonitoringManager  {
 
@@ -19,9 +30,15 @@ public class MonitoringManager  {
 	private ArrayList<Task> currentTasks;
 	private ArrayList<String> activeInternalMetrics;
 	ScheduledExecutorService executor;
-
+	@Autowired
+	protected ApplicationRepository appRepository;
+	InfluxDB influxDB;
+	String urlBD="";
 	public MonitoringManager() {
-		
+		influxDB = InfluxDBFactory.connect(urlBD);
+		 influxDB.query(new Query("CREATE DATABASE alertdb",""));
+		 influxDB.query(new Query("CREATE DATABASE metricdb",""));
+	      
 		this.executor = Executors.newScheduledThreadPool(2);
 		currentAlertGenerators =new HashMap<String,AlertGenerator>();
 		currentTasks= new ArrayList<Task>();
@@ -43,20 +60,20 @@ public class MonitoringManager  {
 			
 			
 			if(((CreateMonitor) t).getRate() instanceof PeriodicRate ) {
-				PeriodicScraper p = new PeriodicScraper(executor,t);
+				PeriodicScraper p = new PeriodicScraper(executor,t,influxDB);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
 				p.scrap();
 			}
 			if(((CreateMonitor) t).getRate() instanceof StochasticRate ) {
 				
-				StochasticScraper p = new StochasticScraper(executor, t);
+				StochasticScraper p = new StochasticScraper(executor, t,influxDB);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
 				
 				p.scrap();
 			
 			}
 			if(((CreateMonitor) t).getRate() instanceof TimeSerieRate ) {
-				TimeSerieScraper p = new TimeSerieScraper(executor,t);
+				TimeSerieScraper p = new TimeSerieScraper(executor,t,influxDB);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
 				p.scrap();
 			}
@@ -79,20 +96,20 @@ public class MonitoringManager  {
         		(MonitoredMetrics.get(((UpdateMonitor) t).getMetricName())).cancelScraping();
         		MonitoredMetrics.remove(((DeleteMonitor) t).getId());
         		if(((CreateMonitor) t).getRate() instanceof PeriodicRate ) {
-    				PeriodicScraper p = new PeriodicScraper(executor,t);
+    				PeriodicScraper p = new PeriodicScraper(executor,t,influxDB);
     				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
     				p.scrap();
     			}
     			if(task.getRate() instanceof StochasticRate ) {
     				
-    				StochasticScraper p = new StochasticScraper(executor, task);
+    				StochasticScraper p = new StochasticScraper(executor, task,influxDB);
     				MonitoredMetrics.put(task.getAdminmetric().getMetricName(),p);
     				
     				p.scrap();
     			
     			}
     			if(task.getRate() instanceof TimeSerieRate ) {
-    				TimeSerieScraper p = new TimeSerieScraper(executor,task);
+    				TimeSerieScraper p = new TimeSerieScraper(executor,task,influxDB);
     				MonitoredMetrics.put(task.getAdminmetric().getMetricName(),p);
     				p.scrap();
     			}
@@ -108,20 +125,28 @@ public class MonitoringManager  {
     	 if(((ReadMonitor)t).isInternalMetric()) {
     		 String[] s= ((ReadMonitor)t).getInternalMetricUniqueIdentifier().split(".");
     		 if(activeInternalMetrics.contains(((ReadMonitor)t).getMetricName()))
-    	        sendMonitoringMessage("kjskfh",OperationType.GetValue,s[s.length-1]);
-    		 else sendMonitoringMessage("kjskfh",OperationType.EnableMetric,s[s.length-1]);
+    	        sendMonitoringMessage(s[0],s[1],OperationType.GetValue,s[s.length-1]);
+    		 else sendMonitoringMessage(s[0],s[1],OperationType.EnableMetric,s[s.length-1]);
     	 } 
     	   
     	   
        else{ 
     	   if(((ReadMonitor)t).isAll()) {
-    		   for(AdminMetric am : metricsCurrentValues) {
-    			   (((ReadMonitor)t).getResult()).add(am.toString()) ;
-    			   
-    		   }
+    		   
+    	 QueryResult queryResult = influxDB.query(new Query("\"Select last(value), * from memory GROUP BY MetricName", "metricdb"));
+    	 InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
+		List<AdminMetric> memoryPointList =  resultMapper
+	     .toPOJO(queryResult, AdminMetric.class);
+		for (AdminMetric am : memoryPointList)
+			((ReadMonitor)t).getResult().add(am.getTime()+" "+am.toSave());	  
+    	 
+    	 
+    	 
+    	// for(AdminMetric am : metricsCurrentValues) {(((ReadMonitor)t).getResult()).add(am.toString()) ;}
+
     	   }
     	   else {
-    		   boolean found =false;
+    		  /* boolean found =false;
     		   int i=0;
     		   while(i<metricsCurrentValues.size() && !found) {
     			if(metricsCurrentValues.get(i).getMetricName().compareTo(((ReadMonitor)t).getMetricName())==0) {
@@ -129,8 +154,16 @@ public class MonitoringManager  {
     				   ((ReadMonitor)t).getResult().add(metricsCurrentValues.get(i).toString());
     			   }
     			i++;
-    		    }
+    		    }*/
+    		  
     		   
+   			QueryResult queryResult = influxDB.query(new Query("Select last(value), * from memory where MetricName = \'"+((ReadMonitor)t).getMetricName()+"\'", "metricdb"));
+			  
+			 
+			InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
+			AdminMetric memoryPointList = (AdminMetric) resultMapper
+			  .toPOJO(queryResult, AdminMetric.class);
+			((ReadMonitor)t).getResult().add(memoryPointList.getTime()+" "+memoryPointList.toSave());
     	       }
 	
             }}
@@ -140,14 +173,16 @@ public class MonitoringManager  {
         if(t instanceof CreateNotifier) {
         	currentTasks.add(t);
         
-	     AlertGenerator a = new AlertGenerator((CreateNotifier)t);
+	     AlertGenerator a = new AlertGenerator((CreateNotifier)t, influxDB);
 	     for(String s :((CreateNotifier)t).getMetrics())
 	     {
 	    	for(AdminMetric am : metricsCurrentValues) {
 	    		if(am.getMetricName()==s) {
 	    			AdminMetric metric=new AdminMetric();
 	    			metric.setMetricName(s);
+	    			metric.setMetrics(am.getMetrics());
 	    			metric.setValue(am.getValue());
+	    			metric.setType(am.getType());
 	    			a.getMetrics().add(metric);
 	    			am.addPropertyChangeListener(a);
 	    		}
@@ -244,12 +279,34 @@ public class MonitoringManager  {
 		return null;
 		
 	}
+	public NCEM findNcemToContactMS(String msIdentifier, String nameApp) {
+		Application app= appRepository.findApplicationByName(nameApp);
 	
+	    int j=0;
+	    int k;
 	
-	public void sendMonitoringMessage(String dest, OperationType op, String internalMetric) {
+	    	while(j<app.getNcems().size()) {
+	    	     k=0;
+	    		 while(k<app.getNcems().get(j).getNc().getMicroServices().size()) {
+	    			 if(app.getNcems().get(j).getNc().getMicroServices().get(k).getIdMicroservice().compareTo(msIdentifier)==0)
+	    		      return app.getNcems().get(j);
+	    			 k++;
+	    		 }
+	    		
+	    		j++; 
+	    	}
+	    	
+		
+		 return null;
+	}
+	
+	public void sendMonitoringMessage(String appName, String msID, OperationType op, String internalMetric) {
+	
 	MonitoringMessage msg= new MonitoringMessage();
     msg.setOp(op);
     msg.setMetricName(internalMetric);
+    NCEM ncem =findNcemToContactMS(msID,appName);
+    ncem.sendMonitoringMsg(msID,msg.toString());
 	}
 	
 	
