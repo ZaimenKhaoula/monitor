@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import org.influxdb.annotation.Column;
 import org.influxdb.annotation.Measurement;
 
-@Measurement(name = "memory")
+@Measurement(name = "metrics")
 public class AdminMetric {
     
 	  @Column(name = "time")

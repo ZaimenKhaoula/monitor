@@ -40,8 +40,6 @@ public class StochasticScraper extends Scraper{
 				} catch (InterruptedException | ExecutionException e) {
 					
 				} 
-                    evaluateExression();
-                    saveValue();
        			    endTime = System.currentTimeMillis();
 					waitNextScrap();
 				

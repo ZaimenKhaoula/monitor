@@ -43,6 +43,8 @@ public abstract class Scraper{
 		        public void run()
 		        {
 		        	getAllInternalMetricsValueOfTheAdminValue();
+		        	evaluateExpression();
+                    saveValue();
 		        }         
 		    };
 	 }

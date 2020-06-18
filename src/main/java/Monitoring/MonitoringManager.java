@@ -33,7 +33,7 @@ public class MonitoringManager  {
 	@Autowired
 	protected ApplicationRepository appRepository;
 	InfluxDB influxDB;
-	String urlBD="";
+	String urlBD="http://172.18.0.1:8086";
 	public MonitoringManager() {
 		influxDB = InfluxDBFactory.connect(urlBD);
 		 influxDB.query(new Query("CREATE DATABASE alertdb",""));
