@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import java.util.ArrayList;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -33,15 +35,25 @@ public class AlertGenerator implements PropertyChangeListener {
 	 private Boolean enable=true;
 	 private ArrayList<AdminMetric> metrics;
 	 InfluxDB influxDB; 
-
-  
+	 Future<?> future;
+	 final ScheduledExecutorService runner;
+	 Runnable AlertSender;
+	 AlertModel alert;
 
 	CreateNotifier notifier= new CreateNotifier();
-	 public AlertGenerator(CreateNotifier t, InfluxDB influxDB) {
-		 this.influxDB=influxDB;
-		this.notifier=t;
+	 public AlertGenerator(CreateNotifier t, InfluxDB influxDB, ScheduledExecutorService runner ) {
+		this.runner = runner;
+		this.influxDB=influxDB;
+	   	this.notifier=t;
 		 metrics = new ArrayList<AdminMetric>();
 		 this.influxDB.setDatabase("alertdb");
+		 AlertSender = new Runnable()
+		    {	        
+		        public void run()
+		        {
+		        	sendAlert(alert.toString());
+		        }         
+		    };
 	 }
 	 public ArrayList<AdminMetric> getMetrics() {
 			return metrics;
@@ -74,14 +86,14 @@ public class AlertGenerator implements PropertyChangeListener {
 		if(isEnable()) {
 		if(evaluateExpression()) {
 			
-	AlertModel a= new AlertModel();	
+	 alert= new AlertModel();	
 	boolean found =false;
 	int i=0;
 	while (!found && i<metrics.size() ) {
 		if((metrics.get(i)).getMetricName().compareTo(notifier.getMetrics().get(0))==0) {
-			a.setType(metrics.get(i).getType());
-			a.setAlertExpression(notifier.expressionToString());
-			a.getMetrics().add(metrics.get(i));
+			alert.setType(metrics.get(i).getType());
+			alert.setAlertExpression(notifier.expressionToString());
+			alert.getMetrics().add(metrics.get(i));
 			found=true;}
 		i++; 
 	}
@@ -89,11 +101,13 @@ public class AlertGenerator implements PropertyChangeListener {
 	Point point = Point.measurement("alerts")
 			  .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
 			  .addField("name", notifier.getId()) 
-			  .addField("value", a.toString()) 
+			  .addField("value", alert.toString()) 
 			  .build();
 	influxDB.write("alertdb", "autogen", point);
 		}}
-	 sendAlert();
+		
+		future= runner.submit(AlertSender);
+	
 	}
 		
 	
@@ -103,7 +117,7 @@ public class AlertGenerator implements PropertyChangeListener {
 		{
 			if (m.getMetricName()==evt.getPropertyName())
 				 m.setValue((Double)evt.getNewValue());
-		}
+		}	
 		
 		generateAlert();}
 	}
@@ -153,16 +167,16 @@ public class AlertGenerator implements PropertyChangeListener {
 	   evaluateExpression();		
 	}
 	
-	public void sendAlert() {
+	public void sendAlert(String alert) {
 		{
 
 	        HttpPost post = new HttpPost(notifier.getUrl());
 
 	      
-	        JSONObject json = new JSONObject();
+	       
 	        StringEntity params = null;
 			try {
-				params = new StringEntity(json.toString());
+				params = new StringEntity(alert);
 			} catch (UnsupportedEncodingException e1) {
 				
 				e1.printStackTrace();

@@ -20,7 +20,7 @@ public class PeriodicScraper extends  Scraper {
 	public void scrap() {
 		
 			if(isEnable())
-			futureTask = runner.scheduleAtFixedRate(scrap,0,period(), TimeUnit.MICROSECONDS);
+			futureTask = runner.scheduleAtFixedRate(scrap,0,period(), unit());
 		   
 		  
 		

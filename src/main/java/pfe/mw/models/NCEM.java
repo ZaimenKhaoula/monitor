@@ -46,6 +46,8 @@ public class NCEM {
 	private String repSocketURL;
 	private String pubSocketURL;
 	private NodeComponent nc;
+	ZContext contextUsedByNcemTosendMonitoringMessages;
+	ZMQ.Socket dealerSocketUsedByNcemTosendMonitoringMessages;
     private Map<String, String> MsIdAndURL =new HashMap<String,String>();
 	String UPLOADED_FOLDER = "";
 	String NODE_ROUTER_IP_ADDRESS;
@@ -86,6 +88,12 @@ public class NCEM {
 	}
 
 	public void runNCEM() {
+		
+	    contextUsedByNcemTosendMonitoringMessages = new ZContext();
+		
+		dealerSocketUsedByNcemTosendMonitoringMessages = contextUsedByNcemTosendMonitoringMessages.createSocket(SocketType.DEALER);
+		
+		
 		/** Respond the Router and µs requests **/
 		context = new ZContext();
 		ZMQ.Socket socketUsedForLaunchingThread = ZThread.fork(context, new ZThread.IAttachedRunnable() {
@@ -106,6 +114,9 @@ public class NCEM {
 								+ ":2224" + "-tcp://" + MAIN_ROUTER_IP_ADDRESS + ":2223" + "-"
 								+ gson.toJson(nc.getMainRouter().getMs_node_map());
 						System.out.println(">>> " + response);
+						dealerSocketUsedByNcemTosendMonitoringMessages.connect("tcp://" + MAIN_ROUTER_IP_ADDRESS + ":2222");
+						dealerSocketUsedByNcemTosendMonitoringMessages.setIdentity(id.getBytes()); 
+						dealerSocketUsedByNcemTosendMonitoringMessages.setSendBufferSize(1024*1024);
 						socket.send(response.getBytes(ZMQ.CHARSET), 0);
 					} else {
 						if (new String(source, ZMQ.CHARSET).equals("nodeRouter")) {
@@ -120,6 +131,7 @@ public class NCEM {
 									+ nc.getRouter().getPubSubRouterFrontendURL() + "-tcp://" + NODE_ROUTER_IP_ADDRESS
 									+ ":" + nc.getRouter().getPubSubRouterBackendURL()+"-"+gson.toJson(nc.getRouter().getRoutingTable());
 							System.out.println(">>> " + response);
+							
 							socket.send(response.getBytes(ZMQ.CHARSET), 0);
 							updateRouter();
 						} else {
@@ -151,6 +163,9 @@ public class NCEM {
 				context.close();
 			}
 		});
+		
+		
+	
 	}
 	///////
 	/////
@@ -640,15 +655,18 @@ public class NCEM {
 	}
 
 	public String sendMonitoringMsg(String des, String msg) {
-		reqSocketUsedToContactMS = contextUsedToContactMs.createSocket(SocketType.REQ);
-		reqSocketUsedToContactMS.connect(MsIdAndURL.get(des));
+
+	    String sourceOfResponse;
 		String replyFromMS=null;
 		while (replyFromMS == null) {
-			reqSocketUsedToContactMS.sendMore("ncem");
-			reqSocketUsedToContactMS.send(msg);
-			replyFromMS = reqSocketUsedToContactMS.recvStr(0);
+			dealerSocketUsedByNcemTosendMonitoringMessages.sendMore(des);
+			dealerSocketUsedByNcemTosendMonitoringMessages.send(msg);
+            sourceOfResponse = dealerSocketUsedByNcemTosendMonitoringMessages.recvStr();
+            replyFromMS = dealerSocketUsedByNcemTosendMonitoringMessages.recvStr();
 			
-	}
-		return replyFromMS;
+		
+
 }
+		return replyFromMS;
+	}
 }

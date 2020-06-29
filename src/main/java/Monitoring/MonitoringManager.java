@@ -29,7 +29,8 @@ public class MonitoringManager  {
 	Map<String,AlertGenerator> currentAlertGenerators; 
 	private ArrayList<Task> currentTasks;
 	private ArrayList<String> activeInternalMetrics;
-	ScheduledExecutorService executor;
+	ScheduledExecutorService threadPoolforScraping;
+	ScheduledExecutorService threadPoolToSendAlerts;
 	@Autowired
 	protected ApplicationRepository appRepository;
 	InfluxDB influxDB;
@@ -39,7 +40,8 @@ public class MonitoringManager  {
 		 influxDB.query(new Query("CREATE DATABASE alertdb",""));
 		 influxDB.query(new Query("CREATE DATABASE metricdb",""));
 	      
-		this.executor = Executors.newScheduledThreadPool(2);
+		this.threadPoolforScraping = Executors.newScheduledThreadPool(5);
+		this.threadPoolToSendAlerts = Executors.newScheduledThreadPool(5);
 		currentAlertGenerators =new HashMap<String,AlertGenerator>();
 		currentTasks= new ArrayList<Task>();
 		MonitoredMetrics =new HashMap<String,Scraper>();
@@ -60,20 +62,20 @@ public class MonitoringManager  {
 			
 			
 			if(((CreateMonitor) t).getRate() instanceof PeriodicRate ) {
-				PeriodicScraper p = new PeriodicScraper(executor,t,influxDB);
+				PeriodicScraper p = new PeriodicScraper(threadPoolforScraping,t,influxDB);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
 				p.scrap();
 			}
 			if(((CreateMonitor) t).getRate() instanceof StochasticRate ) {
 				
-				StochasticScraper p = new StochasticScraper(executor, t,influxDB);
+				StochasticScraper p = new StochasticScraper(threadPoolforScraping, t,influxDB);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
 				
 				p.scrap();
 			
 			}
 			if(((CreateMonitor) t).getRate() instanceof TimeSerieRate ) {
-				TimeSerieScraper p = new TimeSerieScraper(executor,t,influxDB);
+				TimeSerieScraper p = new TimeSerieScraper(threadPoolforScraping,t,influxDB);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
 				p.scrap();
 			}
@@ -96,20 +98,20 @@ public class MonitoringManager  {
         		(MonitoredMetrics.get(((UpdateMonitor) t).getMetricName())).cancelScraping();
         		MonitoredMetrics.remove(((DeleteMonitor) t).getId());
         		if(((CreateMonitor) t).getRate() instanceof PeriodicRate ) {
-    				PeriodicScraper p = new PeriodicScraper(executor,t,influxDB);
+    				PeriodicScraper p = new PeriodicScraper(threadPoolforScraping,t,influxDB);
     				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
     				p.scrap();
     			}
     			if(task.getRate() instanceof StochasticRate ) {
     				
-    				StochasticScraper p = new StochasticScraper(executor, task,influxDB);
+    				StochasticScraper p = new StochasticScraper(threadPoolforScraping, task,influxDB);
     				MonitoredMetrics.put(task.getAdminmetric().getMetricName(),p);
     				
     				p.scrap();
     			
     			}
     			if(task.getRate() instanceof TimeSerieRate ) {
-    				TimeSerieScraper p = new TimeSerieScraper(executor,task,influxDB);
+    				TimeSerieScraper p = new TimeSerieScraper(threadPoolforScraping,task,influxDB);
     				MonitoredMetrics.put(task.getAdminmetric().getMetricName(),p);
     				p.scrap();
     			}
@@ -173,7 +175,7 @@ public class MonitoringManager  {
         if(t instanceof CreateNotifier) {
         	currentTasks.add(t);
         
-	     AlertGenerator a = new AlertGenerator((CreateNotifier)t, influxDB);
+	     AlertGenerator a = new AlertGenerator((CreateNotifier)t, influxDB,threadPoolToSendAlerts);
 	     for(String s :((CreateNotifier)t).getMetrics())
 	     {
 	    	for(AdminMetric am : metricsCurrentValues) {
