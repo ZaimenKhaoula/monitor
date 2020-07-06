@@ -58,6 +58,7 @@ public class MonitoringManager  {
 			currentTasks.add(t);
 			/* AdminMetric am= new AdminMetric(((CreateMonitor) t).getMetricName());
 			 am.setMetricName(((CreateMonitor) t).getMetricName());*/
+			((CreateMonitor) t).getAdminmetric().setExpression(((CreateMonitor) t).expressionToString());
 			 metricsCurrentValues.add(((CreateMonitor) t).getAdminmetric());
 			
 			
@@ -121,15 +122,40 @@ public class MonitoringManager  {
 	     
        }
         
-       
+      //readMonitor is used to get all the adminMetrics or a specific adminMetric refrenced  
+     //by its name or it is used to get an internal metric value
        if(t instanceof ReadMonitor) {
     	   
     	 if(((ReadMonitor)t).isInternalMetric()) {
+    		 MonitoringMessage msg= new MonitoringMessage(); 
+    		 
+    		 if(((ReadMonitor)t).getInternalMetricType().compareTo("counter")==0) {
+    			 msg.setMetricType("counter");
     		 String[] s= ((ReadMonitor)t).getInternalMetricUniqueIdentifier().split(".");
-    		 if(activeInternalMetrics.contains(((ReadMonitor)t).getMetricName()))
-    	        sendMonitoringMessage(s[0],s[1],OperationType.GetValue,s[s.length-1]);
-    		 else sendMonitoringMessage(s[0],s[1],OperationType.EnableMetric,s[s.length-1]);
+    		
+    		msg.setMetricName(s[s.length-1]);
+    		 if(activeInternalMetrics.contains(s[s.length-1]))
+    	    {msg.setOp(OperationType.GetValue);
+    	((ReadMonitor)t).setInternalMetricValue(sendMonitoringMessage(s[0],s[1],msg));}
+    		 else {
+    			 msg.setOp(OperationType.EnableMetric);
+    			 sendMonitoringMessage(s[0],s[1],msg);
+    		     activeInternalMetrics.add(((ReadMonitor)t).getMetricName());
+    		 ((ReadMonitor)t).setInternalMetricValue("0.0");}
     	 } 
+    		 else {if(((ReadMonitor)t).getInternalMetricType().compareTo("rtt")==0) {
+    			 msg.setMetricType("rtt");
+    			 String[] s= ((ReadMonitor)t).getRttInternalMetric().split(":");
+    			 msg.setUrlDesMs(s[s.length-1]);
+    			 String[] input=s[1].split("\\.");
+        		 msg.setOp(OperationType.GetValue);			
+              ((ReadMonitor)t).setInternalMetricValue(sendMonitoringMessage(input[0],input[1],msg));
+        			 
+        		 
+        		 
+    		 }
+    		 }
+    		 }
     	   
     	   
        else{ 
@@ -139,25 +165,11 @@ public class MonitoringManager  {
     	 InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
 		List<AdminMetric> memoryPointList =  resultMapper
 	     .toPOJO(queryResult, AdminMetric.class);
-		for (AdminMetric am : memoryPointList)
-			((ReadMonitor)t).getResult().add(am.getTime()+" "+am.toSave());	  
-    	 
-    	 
-    	 
-    	// for(AdminMetric am : metricsCurrentValues) {(((ReadMonitor)t).getResult()).add(am.toString()) ;}
+		((ReadMonitor)t).setResult(memoryPointList);
 
     	   }
     	   else {
-    		  /* boolean found =false;
-    		   int i=0;
-    		   while(i<metricsCurrentValues.size() && !found) {
-    			if(metricsCurrentValues.get(i).getMetricName().compareTo(((ReadMonitor)t).getMetricName())==0) {
-    				   found=true;
-    				   ((ReadMonitor)t).getResult().add(metricsCurrentValues.get(i).toString());
-    			   }
-    			i++;
-    		    }*/
-    		  
+    		
     		   
    			QueryResult queryResult = influxDB.query(new Query("Select last(value), * from memory where MetricName = \'"+((ReadMonitor)t).getMetricName()+"\'", "metricdb"));
 			  
@@ -165,7 +177,8 @@ public class MonitoringManager  {
 			InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
 			AdminMetric memoryPointList = (AdminMetric) resultMapper
 			  .toPOJO(queryResult, AdminMetric.class);
-			((ReadMonitor)t).getResult().add(memoryPointList.getTime()+" "+memoryPointList.toSave());
+			((ReadMonitor)t).getResult().add(memoryPointList);
+			((ReadMonitor)t).setInternalMetricValue(memoryPointList.getValue().toString());
     	       }
 	
             }}
@@ -302,13 +315,12 @@ public class MonitoringManager  {
 		 return null;
 	}
 	
-	public void sendMonitoringMessage(String appName, String msID, OperationType op, String internalMetric) {
+	public String sendMonitoringMessage(String appName, String msID, MonitoringMessage msg) {
 	
-	MonitoringMessage msg= new MonitoringMessage();
-    msg.setOp(op);
-    msg.setMetricName(internalMetric);
+  
     NCEM ncem =findNcemToContactMS(msID,appName);
-    ncem.sendMonitoringMsg(msID,msg.toString());
+    String result=   ncem.sendMonitoringMsg(msID,msg.toString());
+    return result;
 	}
 	
 	

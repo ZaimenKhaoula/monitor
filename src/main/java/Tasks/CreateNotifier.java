@@ -36,7 +36,7 @@ public class CreateNotifier extends Task{
 	public String expressionToString() {
 		String s="";
 		for(String st: expression ) {
-			s=s+st;
+			s=s+st+":";
 		}
 		return s;
 	}

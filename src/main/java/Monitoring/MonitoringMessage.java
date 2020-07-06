@@ -10,7 +10,7 @@ public class MonitoringMessage {
 @Override
 public String toString() {
 
-	return metricType+"-"+op+"-"+metricType+"-"+urlDesMs;
+	return metricType+"-"+op+"-"+urlDesMs;
 }
 
 

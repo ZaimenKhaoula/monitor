@@ -4,7 +4,7 @@ public abstract class InternalMetric {
 	 
 	private String appName;
 
-	private float Value;
+	protected float Value;
 	
 		public float getValue() {
 		return Value;

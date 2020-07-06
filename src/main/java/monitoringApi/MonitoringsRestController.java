@@ -2,7 +2,7 @@ package monitoringApi;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,22 +30,25 @@ public class MonitoringsRestController {
 	
 	
 	@GetMapping("/monitorings")
-	public String getAllMonitoringTasks() {
+	public List<AdminMetric>getAllMonitoringTasks() {
        ReadMonitor reader = new ReadMonitor();
        reader.setAll(true);
 	   monitorManager.taskProccessing(reader);
 		
-		return reader.toString();
+		return reader.getResult();
 		
 	}
 	
 	@GetMapping("/monitorings/{MetricName}")
-	public void getMonitoringTask(@PathVariable String MetricName) throws InterruptedException, ParseException {
+	public String getMonitoringTask(@PathVariable String MetricName) throws InterruptedException, ParseException {
 		
 		is = new ByteArrayInputStream(MetricName.getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
-		monitorManager.taskProccessing(parser.ReadMonitoringResource());
+		ReadMonitor r = new ReadMonitor();
+		r=parser.ReadMonitoringResource();
+		monitorManager.taskProccessing(r);
+		return r.getInternalMetricValue();
 	}
 	
 	@PostMapping("/monitorings")
@@ -53,32 +56,34 @@ public class MonitoringsRestController {
 		is = new ByteArrayInputStream((monitor.toString()).getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
-		System.out.println((parser.CreateMonitoringResource()).toString());
-		return new ResponseEntity<>("start scraping metric", HttpStatus.OK);
-
-		//monitorManager.taskProccessing(parser.CreateMonitoringResource());
-		
+		monitorManager.taskProccessing(parser.CreateMonitoringResource());
+		return new ResponseEntity<>("start scraping metric...", HttpStatus.OK);
 	}
 	
 	
 	@PatchMapping("/monitorings/{MetricName}")
-	public void updateMonitoringTask(@PathVariable String MetricName ,@RequestBody RateModel newRate){
+	public ResponseEntity<String> updateMonitoringTask(@PathVariable String MetricName ,@RequestBody RateModel newRate){
 		
 		operation="UpdateMonitor"+MetricName+newRate.toString();
 		is = new ByteArrayInputStream(operation.getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
-		//monitorManager.taskProccessing(parser.UpdateMonitoringResource());
+		try {
+			monitorManager.taskProccessing(parser.UpdateMonitoringResource());
+		} catch (ParseException e) {
+			
+		}
+		return new ResponseEntity<> ("MonitoringRessource Updated" , HttpStatus.OK);
 		
 	}
 	
 	@DeleteMapping("/monitorings/{MetricName}")
-public void deleteMonitoringTask(@PathVariable String MetricName) throws InterruptedException, ParseException {
+public ResponseEntity<String> deleteMonitoringTask(@PathVariable String MetricName) throws InterruptedException, ParseException {
 		DeleteMonitor deleteM = new DeleteMonitor();
 		deleteM.setId(MetricName);
 		monitorManager.taskProccessing(deleteM);
 	
-		
+		return new ResponseEntity<> ("MonitoringRessource Deleted" , HttpStatus.OK);
 	}
 	@GetMapping("/notifiers")
 	public void getAllNotifierTasks() {

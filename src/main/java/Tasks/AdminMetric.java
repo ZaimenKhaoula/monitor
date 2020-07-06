@@ -29,6 +29,7 @@ public class AdminMetric {
 	
 	
 	private ArrayList<InternalMetric> metrics;
+	private String expression;
 	private PropertyChangeSupport support;
 	public AdminMetric(){
 		metrics = new ArrayList<InternalMetric>();
@@ -64,7 +65,8 @@ public class AdminMetric {
 			return s;
 	    }
 	    public String toSave() {
-	    	return MetricName+"-"+type+"-"+Double.toString(value);
+	    	return MetricName+"-"+type+"-"+Double.toString(value)
+	    			+"-"+expression;
 	    }
 	    
 		@Override
@@ -83,6 +85,12 @@ public class AdminMetric {
 		}
 		public void setMetrics(ArrayList<InternalMetric> metrics) {
 			this.metrics = metrics;
+		}
+		public String getExpression() {
+			return expression;
+		}
+		public void setExpression(String expression) {
+			this.expression = expression;
 		}
 	
 	

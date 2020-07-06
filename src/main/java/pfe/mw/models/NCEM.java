@@ -39,7 +39,6 @@ import pfe.mw.models.Status;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import Monitoring.MonitoringMessage;
 
 public class NCEM {
 	private String id;

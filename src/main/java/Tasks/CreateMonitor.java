@@ -37,11 +37,16 @@ public class CreateMonitor extends Task{
 	}
 	
 	@Override
-	public String toString() {return adminmetric.getMetricName()+expression.toString();}
+	public String toString() {return adminmetric.getMetricName()+expressionToString();}
 	public AdminMetric getAdminmetric() {
 		return adminmetric;
 	}
 	
-	
-	
+	public String expressionToString() {
+	 String a="";
+	 for (String m : expression) {
+	  a=a+m+":";	 
+	 }
+	 return a;
+	}
 }

@@ -19,10 +19,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
-import org.influxdb.dto.Query;
-import org.json.JSONObject;
 import org.mariuszgromada.math.mxparser.Expression;
 
 

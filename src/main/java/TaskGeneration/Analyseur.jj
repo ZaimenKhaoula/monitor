@@ -97,9 +97,13 @@ CreateNotifier task = new CreateNotifier();} {
 // a get operation on internal metric enables it if it was disabled.
 ReadMonitor ReadMonitoringResource():{
 Token tok1= null;
+String rtt="";
 ReadMonitor task = new ReadMonitor();} {
  tok1=<MetricName> {task.setMetricName(tok1.toString());}|
-tok1=<Id>{task.setInternalMetricUniqueIdentifier(tok1.toString());task.setInternalMetric(true);}
+ tok1=<RTT> {rtt=rtt+tok1.toString();task.setInternalMetricType("rtt");}tok1=<separateur>{rtt=rtt+tok1.toString();}tok1=<Idms>
+{rtt=rtt+tok1.toString();}tok1=<separateur>{rtt=rtt+tok1.toString();}tok1=<Idms>{rtt=rtt+tok1.toString();task.setRttInternalMetric(rtt);}|
+tok1=<Id>{task.setInternalMetricType("counter");task.setInternalMetricUniqueIdentifier(tok1.toString());task.setInternalMetric(true);}
+
  
  {return task; } }
    
