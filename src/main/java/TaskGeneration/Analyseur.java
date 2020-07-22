@@ -156,15 +156,28 @@ CreateNotifier task = new CreateNotifier();
 // a get operation on internal metric enables it if it was disabled.
   final public ReadMonitor ReadMonitoringResource() throws ParseException {
 Token tok1= null;
+String rtt="";
 ReadMonitor task = new ReadMonitor();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case MetricName:
       tok1 = jj_consume_token(MetricName);
                     task.setMetricName(tok1.toString());
       break;
+    case RTT:
+      tok1 = jj_consume_token(RTT);
+             rtt=rtt+tok1.toString();task.setInternalMetricType("rtt");
+      tok1 = jj_consume_token(separateur);
+                                                                                          rtt=rtt+tok1.toString();
+      tok1 = jj_consume_token(Idms);
+ rtt=rtt+tok1.toString();
+      tok1 = jj_consume_token(separateur);
+                                            rtt=rtt+tok1.toString();
+      tok1 = jj_consume_token(Idms);
+                                                                                 rtt=rtt+tok1.toString();task.setRttInternalMetric(rtt);
+      break;
     case Id:
       tok1 = jj_consume_token(Id);
-          task.setInternalMetricUniqueIdentifier(tok1.toString());task.setInternalMetric(true);
+          task.setInternalMetricType("counter");task.setInternalMetricUniqueIdentifier(tok1.toString());task.setInternalMetric(true);
   {if (true) return task;}
       break;
     default:
@@ -339,7 +352,7 @@ ReadMonitor task = new ReadMonitor();
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case parenthF:
           tok1 = jj_consume_token(parenthF);
-                 System.out.println(tok1.toString());task.getExpression().add(tok1.toString());System.out.println("hadi kafal bifa");
+                 System.out.println(tok1.toString());task.getExpression().add(tok1.toString());
           break;
         default:
           jj_la1[18] = jj_gen;
@@ -384,15 +397,14 @@ ReadMonitor task = new ReadMonitor();
           jj_la1[22] = jj_gen;
           break label_8;
         }
-  System.out.println("dkhal l operateur tania");
         tok1 = jj_consume_token(operateur);
-                                                                   task.getExpression().add(tok1.toString());
+                  task.getExpression().add(tok1.toString());
         label_9:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case number:
             tok1 = jj_consume_token(number);
-                                                                                                                              task.getExpression().add(tok1.toString());
+                                                                             task.getExpression().add(tok1.toString());
             break;
           case fonction:
           case parenthO:
@@ -662,7 +674,7 @@ ReadMonitor task = new ReadMonitor();
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x700000,0x2000000,0x2000000,0x1000,0xe0000,0x22000000,0x20,0xa0000000,0x20,0x82000000,0x82000000,0x40,0x40,0x2008000,0x20,0x2008000,0x400,0x2008000,0x200,0x400,0x2008040,0x200,0x20,0x40,0x100,0x40,0x100,0x2008000,0x20,0x2008000,0x2008000,0x200,0x2008140,0x400,0x200,0x2008140,0x2008140,0x82008040,0x2000000,0x2000000,0x1000,0xe0000,};
+      jj_la1_0 = new int[] {0x700000,0x2000000,0x2000000,0x1000,0xe0000,0x22000000,0x20,0xa0008000,0x20,0x82000000,0x82000000,0x40,0x40,0x2008000,0x20,0x2008000,0x400,0x2008000,0x200,0x400,0x2008040,0x200,0x20,0x40,0x100,0x40,0x100,0x2008000,0x20,0x2008000,0x2008000,0x200,0x2008140,0x400,0x200,0x2008140,0x2008140,0x82008040,0x2000000,0x2000000,0x1000,0xe0000,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};

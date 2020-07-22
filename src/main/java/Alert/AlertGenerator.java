@@ -86,11 +86,13 @@ public class AlertGenerator implements PropertyChangeListener {
 	 alert= new AlertModel();	
 	boolean found =false;
 	int i=0;
+	
 	while (!found && i<metrics.size() ) {
 		if((metrics.get(i)).getMetricName().compareTo(notifier.getMetrics().get(0))==0) {
 			alert.setType(metrics.get(i).getType());
-			alert.setAlertExpression(notifier.expressionToString());
 			alert.getMetrics().add(metrics.get(i));
+			alert.setAlertExpression(notifier.expressionToString());
+			alert.setAppName((metrics.get(i)).getMetrics().get(0).getAppName());
 			found=true;}
 		i++; 
 	}

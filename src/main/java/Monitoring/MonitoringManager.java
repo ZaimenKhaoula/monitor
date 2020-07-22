@@ -32,7 +32,7 @@ public class MonitoringManager  {
 	ScheduledExecutorService threadPoolforScraping;
 	ScheduledExecutorService threadPoolToSendAlerts;
 	@Autowired
-	protected ApplicationRepository appRepository;
+	private ApplicationRepository appRepository;
 	InfluxDB influxDB;
 	String urlBD="http://172.18.0.1:8086";
 	public MonitoringManager() {

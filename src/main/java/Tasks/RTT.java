@@ -26,7 +26,7 @@ public class RTT extends InternalMetric {
 	}
 	@Override
 	public String toString() {
-		return "rtt :"+IDusSource+":"+IDusDestination+":"+Value;
+		return "rtt *"+IDusSource+"*"+IDusDestination+"*"+Value;
 	}
 	
 	
