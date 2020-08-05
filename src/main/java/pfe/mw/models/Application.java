@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import io.swagger.annotations.ApiModelProperty;
+import pfe.mw.controllers.NCEM;
 
 @Document(collection = "applications")
 public class Application {
@@ -84,8 +85,21 @@ public class Application {
 			i++;
 		}
 		return nc;
-
 	}
+
+	/*public NodeComponent getAdapterNC(AdapterType adapter) {
+		int i = 0;
+		NodeComponent nc = null;
+		boolean found = false;
+		while (i < ncems.size() && !found) {
+			found = ncems.get(i).getNc().hasAdapter(adapter);
+			if (found)
+				nc = ncems.get(i).getNc();
+			i++;
+		}
+		return nc;
+
+	}*/
 
 	public void setMainRouter(MainRouter mainRouter) {
 		if (getMainRouter() == null)

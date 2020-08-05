@@ -1,5 +1,6 @@
 package pfe.mw.models;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.data.annotation.Id;

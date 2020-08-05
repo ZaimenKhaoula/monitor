@@ -2,6 +2,10 @@ package pfe.mw.models;
 
 import org.springframework.data.annotation.Id;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Router {
 	@Id

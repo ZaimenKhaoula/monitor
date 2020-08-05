@@ -1,18 +1,21 @@
 package pfe.mw.models;
 
+
+import java.util.ArrayList;
+
 public class Route {
 	private String source;
 	private String destination;
 	private String nextHop;
 	private String state;
-	private String tags;
+	private String redirections;
 
-	public Route(String source, String destination, String nextHop, String state, String tags) {
+	public Route(String source, String destination, String nextHop, String state,String redirections) {
 		this.source = source;
 		this.destination = destination;
 		this.nextHop = nextHop;
 		this.state = state;
-		this.tags = tags;
+		this.redirections = redirections;
 	}
 
 	public String getNextHop() {
@@ -47,12 +50,12 @@ public class Route {
 		this.state = state;
 	}
 
-	public String getTags() {
-		return tags;
+	public String getRedirections() {
+		return redirections;
 	}
 
-	public void setTags(String tags) {
-		this.tags = tags;
+	public void setRedirections(String redirections) {
+		this.redirections = redirections;
 	}
 
 }

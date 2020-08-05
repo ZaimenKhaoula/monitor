@@ -67,15 +67,15 @@ public abstract class Scraper{
       	    	}
       	    else {
       	    	msg.setMetricType("rtt");
-                   if(getUrlMsByMsName(m.getAppName(),((RTT)m).getIDusDestination())!=null) {
+         /* if(getUrlMsByMsName(m.getAppName(),((RTT)m).getIDusDestination())!=null) {
                   	 msg.setUrlDesMs(getUrlMsByMsName(m.getAppName(),((RTT)m).getIDusDestination()));
                   
-                   }
+                   }*/
                    des=((RTT) m).getIDusSource();
                    ncem =findNcemToContactMS(((RTT) m).getIDusSource(),((RTT) m).getAppName());
   	    	}
       	    
-      	    if(ncem== null) System.out.println("ncem not found");
+      	    if(ncem== null) System.out.println("ncem not found to send monitoring msg");
       	    else
       	    m.setValue(Float.parseFloat(ncem.sendMonitoringMsg(des,msg.toString())));
       	    }
@@ -143,7 +143,7 @@ public abstract class Scraper{
 	}
 	
 	
-	public String getUrlMsByMsName(String appName,String msID) {
+/*	public String getUrlMsByMsName(String appName,String msID) {
 		Application app= appRepository.findApplicationByName(appName);
        int i=0;
       
@@ -155,7 +155,7 @@ public abstract class Scraper{
     	 i++;
        }
 		return null;
-	}
+	}*/
 
 	
 	private String replaceMetricByValue(String s) {

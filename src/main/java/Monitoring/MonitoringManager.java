@@ -34,7 +34,7 @@ public class MonitoringManager  {
 	@Autowired
 	private ApplicationRepository appRepository;
 	InfluxDB influxDB;
-	String urlBD="http://172.18.0.1:8086";
+	String urlBD="http://192.168.5.51:8086";
 	public MonitoringManager() {
 		influxDB = InfluxDBFactory.connect(urlBD);
 		 influxDB.query(new Query("CREATE DATABASE alertdb",""));
