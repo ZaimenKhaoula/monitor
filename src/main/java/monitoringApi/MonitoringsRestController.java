@@ -147,7 +147,7 @@ public ResponseEntity<String> deleteMonitoringTask(@PathVariable String MetricNa
 		 DirectOpOnInternalMetric m = new DirectOpOnInternalMetric (InternalMetricName,"reset") ;    
 	          monitorManager.taskProccessing(m);
 	          if (m.isFinished())
-			return new ResponseEntity<String>("intenal metric enabled ", HttpStatus.OK);
+			return new ResponseEntity<String>("intenal metric is reset to zero  ", HttpStatus.OK);
 
 		 else 
 			return new ResponseEntity<String>("operation failed", HttpStatus.BAD_REQUEST);
