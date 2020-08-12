@@ -13,7 +13,7 @@ public class ReadMonitor extends Task{
 	private String oneMetricResult;
 	private String rttInternalMetric;
 	private String internalMetricUniqueIdentifier;
-	
+	private int limit;
 	public boolean isAll() {
 		return all;
 	}
@@ -73,5 +73,11 @@ public class ReadMonitor extends Task{
 	}
 	public void setOneMetricResult(String oneMetricResult) {
 		this.oneMetricResult = oneMetricResult;
+	}
+	public int getLimit() {
+		return limit;
+	}
+	public void setLimit(int limit) {
+		this.limit = limit;
 	}
 }

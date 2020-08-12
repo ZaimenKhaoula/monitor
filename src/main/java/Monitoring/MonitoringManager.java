@@ -20,7 +20,7 @@ import Alert.AlertGenerator;
 import MetricScraping.*;
 import Tasks.*;
 import pfe.mw.models.*;
-
+import Alert.influxdbAlertMapping;
 
 @Service
 public class MonitoringManager  {
@@ -86,7 +86,9 @@ public class MonitoringManager  {
         if(t instanceof DeleteMonitor) {
         		if (MonitoredMetrics.containsKey(((DeleteMonitor) t).getId()) ) {(MonitoredMetrics.get(((DeleteMonitor) t).getId())).cancelScraping();
         		 currentTasks.remove((DeleteMonitor) t);
-        		MonitoredMetrics.remove(((DeleteMonitor) t).getId());}
+        		MonitoredMetrics.remove(((DeleteMonitor) t).getId());
+   QueryResult queryResult = influxDB.query(new Query("DELETE FROM metrics WHERE MetricName = '"+((DeleteMonitor)t).getId()+"'", "metricdb"));
+     			}
        t.setFinished(true);
 		}
      /**set metric rate**/
@@ -156,7 +158,7 @@ public class MonitoringManager  {
        else{ 
     	   if(((ReadMonitor)t).isAll()) {
     		   
-    	 QueryResult queryResult = influxDB.query(new Query("\"SELECT last(value), * FROM metrics GROUP BY name", "metricdb"));
+    	 QueryResult queryResult = influxDB.query(new Query("SELECT last(value), * FROM metrics GROUP BY MetricName", "metricdb"));
     	 InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
 		List<influxdbMappingClass> memoryPointList =  resultMapper
 	     .toPOJO(queryResult, influxdbMappingClass.class);
@@ -166,12 +168,12 @@ public class MonitoringManager  {
     	   else {
     		
     		   
-   		    QueryResult queryResult = influxDB.query(new Query("SELECT  * FROM metrics WHERE name = \'"+((ReadMonitor)t).getMetricName()+"\' ORDER BY time DESC", "metricdb"));
+   		    QueryResult queryResult = influxDB.query(new Query("SELECT * FROM metrics WHERE MetricName = '"+((ReadMonitor)t).getMetricName()+"' ORDER BY time DESC LIMIT "+((ReadMonitor)t).getLimit(), "metricdb"));
 			InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
 			List<influxdbMappingClass> memoryPointList = resultMapper
 			  .toPOJO(queryResult, influxdbMappingClass.class);
 			((ReadMonitor)t).setResult(memoryPointList);
-			((ReadMonitor)t).setOneMetricResult(memoryPointList.get(0).getValue().toString());
+		
     	       }
 	
             }
@@ -235,7 +237,9 @@ public class MonitoringManager  {
         	
      if (currentAlertGenerators.containsKey(((DeleteNotifier) t).getNotifierId())) { (currentAlertGenerators.get(((DeleteNotifier) t).getNotifierId())).cancelNotifying();
         	
-       currentAlertGenerators.remove(((DeleteNotifier) t).getNotifierId());}
+       currentAlertGenerators.remove(((DeleteNotifier) t).getNotifierId());
+       QueryResult queryResult = influxDB.query(new Query("DELETE FROM alerts WHERE id = '"+((DeleteNotifier) t).getNotifierId()+"'", "alertdb")); 
+     }
 		}
         
         
@@ -244,22 +248,21 @@ public class MonitoringManager  {
         if(t instanceof ReadNotifier) {
         	
         	if(((ReadNotifier)t).isAll()) {
-     		   for(Task task : currentTasks) {
-     			   if(task instanceof CreateNotifier) {
-     			   (((ReadNotifier)t).getResult()).add(task.toString()) ;}
-     			   
+        		   
+       		    QueryResult queryResult = influxDB.query(new Query("SELECT * FROM alerts", "alertdb"));
+    			InfluxDBResultMapper resultMapper1 = new InfluxDBResultMapper();
+    			List<influxdbAlertMapping> memoryPointList1 = resultMapper1
+    			  .toPOJO(queryResult, influxdbAlertMapping .class);
+    			((ReadNotifier)t).setResult(memoryPointList1);  
      		   }
-     	   }
+     	   
      	   else {
-     		   boolean found =false;
-     		   int i=0;
-     		   while(i<currentTasks.size()&& !found) {
-     			if(currentTasks.get(i) instanceof CreateNotifier && ((CreateNotifier)(currentTasks.get(i))).getId().compareTo(((ReadNotifier)t).getId())==0) {
-     				   found=true;
-     				   ((ReadNotifier)t).getResult().add(((CreateNotifier)currentTasks.get(i)).toString());
-     			   }
-     			i++;
-     		    }
+     		   
+      		 QueryResult queryResult = influxDB.query(new Query("SELECT * FROM alerts WHERE id = '"+((ReadNotifier)t).getId()+"'", "alertdb"));
+   			InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
+   			List<influxdbAlertMapping> memoryPointList = resultMapper
+   		    .toPOJO(queryResult, influxdbAlertMapping.class);
+   			((ReadNotifier)t).setResult(memoryPointList);
      		   
      	       }
     	    t.setFinished(true);

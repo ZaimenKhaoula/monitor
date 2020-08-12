@@ -7,6 +7,10 @@ public class CreateNotifier extends Task{
 	private ArrayList<String> expression;
 	private ArrayList<String> metrics; 
 	private String url;
+
+	public void setExpression(ArrayList<String> expression) {
+		this.expression = expression;
+	}
 	public CreateNotifier() {
 	this.expression =new ArrayList<String>(); 
 	this.metrics=new ArrayList<String>();

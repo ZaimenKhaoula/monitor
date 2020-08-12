@@ -97,12 +97,12 @@ public class AlertGenerator implements PropertyChangeListener {
 		i++; 
 	}
 	
-	Point point = Point.measurement("alerts")
+	           Point point = Point.measurement("alerts")
 			  .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-			  .addField("name", notifier.getId()) 
+			  .tag("id", notifier.getId()) 
 			  .addField("value", alert.toString()) 
 			  .build();
-	influxDB.write("alertdb", "autogen", point);
+	           influxDB.write("alertdb", "autogen", point);
 		}}
 		
 		future= runner.submit(AlertSender);

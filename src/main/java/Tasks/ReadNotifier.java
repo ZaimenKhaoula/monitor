@@ -1,10 +1,13 @@
 package Tasks;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import Alert.influxdbAlertMapping;
 
 public class ReadNotifier extends Task {
 	private boolean all =false;
-	private ArrayList<String> result = new ArrayList<String>();
+	private List<influxdbAlertMapping> result = new ArrayList<influxdbAlertMapping>();
 	
 	public boolean isAll() {
 		return all;
@@ -13,21 +16,13 @@ public class ReadNotifier extends Task {
 		this.all = all;
 	}
 
-	public ArrayList<String> getResult() {
+	public List<influxdbAlertMapping> getResult() {
 		return result;
 	}
-	public void setResult(ArrayList<String> resulat) {
+	public void setResult(List<influxdbAlertMapping>resulat) {
 		this.result = resulat;
 	}
 	
-	@Override
-	public String toString () {
-		String r = "";
-		for(String s: result) {
-			r=r+" "+s;
-		}
-		
-		return r;
-	}
+
 
 }

@@ -51,17 +51,22 @@ public class MonitoringsRestController {
 	}
 	
 	@GetMapping("/monitorings/{MetricName}")
-	public String getMonitoringTask(@PathVariable(required = true) String MetricName,@PathVariable(required = true) int nbDemandee) throws InterruptedException, ParseException {
+	public  ResponseEntity<?> getMonitoringTask(@PathVariable(required = true) String MetricName,@PathVariable(required = true) int limit) throws InterruptedException, ParseException {
 		is = new ByteArrayInputStream(MetricName.getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
 		ReadMonitor r = new ReadMonitor();
+		r.setLimit(limit);
 		r=parser.ReadMonitoringResource();
 		
 		monitorManager.taskProccessing(r);
-
-		return r.getOneMetricResult();
-	
+		if(r.isFinished()) {
+           if(r.isInternalMetric()==false)
+		 return new ResponseEntity<>(r.getResult(), HttpStatus.OK);
+  		 else 
+				return new ResponseEntity<String>(r.getOneMetricResult(),HttpStatus.OK);}
+		else
+			return new ResponseEntity<String>("operation failed", HttpStatus.BAD_REQUEST);
 		
 	}
 	
@@ -152,21 +157,43 @@ public ResponseEntity<String> deleteMonitoringTask(@PathVariable String MetricNa
 	
 	
 	@GetMapping("/notifiers")
-	public void getAllNotifierTasks() {
+	public ResponseEntity<?> getAllNotifierTasks() {
 		ReadNotifier readerN = new ReadNotifier();
 	     readerN.setAll(true);
          monitorManager.taskProccessing(readerN);
+         if(readerN.isFinished())
+         return new ResponseEntity<> (readerN.getResult() , HttpStatus.OK);
+         else 
+ 			return new ResponseEntity<String>("operation failed", HttpStatus.BAD_REQUEST);
 			
 	}
 	
-	@PostMapping("/notifiers/update")
+	
+	@GetMapping("/notifiers/{NotifierId}")
+	public  ResponseEntity<?> getNotifierTask(@PathVariable(required = true) String notifierId) throws InterruptedException, ParseException {
+	
+		ReadNotifier readerN = new ReadNotifier();
+		readerN.setId(notifierId);
+		monitorManager.taskProccessing(readerN);
+		 if(readerN.isFinished())
+	         return new ResponseEntity<> (readerN.getResult() , HttpStatus.OK);
+	         else 
+	 			return new ResponseEntity<String>("operation failed", HttpStatus.BAD_REQUEST);
+				
+		
+	}
+	
+	
+	
+	@PostMapping("/notifiers/add")
 	public ResponseEntity<String> addNotifierTask(@RequestBody NotifierModel notifier) throws InterruptedException, ParseException{
 		is = new ByteArrayInputStream((notifier.toString()).getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
-		monitorManager.taskProccessing(parser.CreateNotifierResource());
+		CreateNotifier notif=parser.CreateNotifierResource();
+		monitorManager.taskProccessing(notif);
 		
-		return new ResponseEntity<String> ("Notifier added succesfully" , HttpStatus.OK);
+		return new ResponseEntity<String> ("Notifier added succesfully with id "+notif.getId() , HttpStatus.OK);
 	}
 		
    @DeleteMapping("/notifiers/delete/{notifierId}")
@@ -176,7 +203,7 @@ public ResponseEntity<String> deleteMonitoringTask(@PathVariable String MetricNa
 	   DeleteNotifier deleteN = new DeleteNotifier();
 	    deleteN.setNotifierId(notifierId);
 		monitorManager.taskProccessing(deleteN);
-		 return new ResponseEntity<String> ("Notifier deleted succesfully" , HttpStatus.OK);
+	    return new ResponseEntity<String> ("Notifier deleted succesfully" , HttpStatus.OK);
 	   }
 	   else return new ResponseEntity<String> ("Notifier not found" , HttpStatus.BAD_REQUEST);
 		   
