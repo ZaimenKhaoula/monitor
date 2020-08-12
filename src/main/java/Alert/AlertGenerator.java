@@ -162,9 +162,7 @@ public class AlertGenerator implements PropertyChangeListener {
 		this.enable=false;
 		
 	}
-	public void start() {
-	   evaluateExpression();		
-	}
+
 	
 	public void sendAlert(String alert) {
 		{

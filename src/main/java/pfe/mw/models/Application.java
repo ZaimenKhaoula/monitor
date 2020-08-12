@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import io.swagger.annotations.ApiModelProperty;
-import pfe.mw.controllers.NCEM;
+import pfe.mw.models.NCEM;
 
 @Document(collection = "applications")
 public class Application {

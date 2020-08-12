@@ -6,19 +6,22 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.InfluxDB;
+import org.springframework.stereotype.Component;
 
 import Tasks.*;
+import pfe.mw.models.ApplicationRepository;
 
+@Component
 public class PeriodicScraper extends  Scraper {
 	ScheduledFuture<?> futureTask;
-	public PeriodicScraper(ScheduledExecutorService executor, Task t,InfluxDB influxDB) {
-		super(executor,t,influxDB);
+	public PeriodicScraper(ScheduledExecutorService executor, Task t,InfluxDB influxDB,ApplicationRepository app) {
+		super(executor,t,influxDB,app);
 		
 	}
 	
 
 	public void scrap() {
-		
+		 System.out.println("inside periodic scraper");
 			if(isEnable())
 			futureTask = runner.scheduleAtFixedRate(scrap,0,period(), unit());
 		   

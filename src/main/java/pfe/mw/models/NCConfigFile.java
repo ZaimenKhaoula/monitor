@@ -8,18 +8,15 @@ public class NCConfigFile {
 		private Map<String, String> data = new HashMap<>();
 	    private String repSocketURL;
 	    private String pubSocketURL;
-	    private String routerSocketURL;
 
 
-		public NCConfigFile(String configFileName, String repSocketURL, String pubSocketURL, String routerSocketURL) {
+		public NCConfigFile(String configFileName, String repSocketURL, String pubSocketURL) {
 	        
 	    	this.configFileName=configFileName;
 	    	this.repSocketURL = repSocketURL;
 	    	this.pubSocketURL = pubSocketURL;
-	    	this.pubSocketURL = pubSocketURL;
 	    	data.put("address_rep","address.rep= "+repSocketURL);
 	        data.put("address_pub","address.pub= "+pubSocketURL);
-	        data.put("address_router","address.router= "+routerSocketURL);
 	        /*
 	        data.put("routerUniqueIdentifier","routerUniqueIdentifier= "+routerUniqueIdentifier);
 	        data.put("clientServerRouterURL","clientServerRouterURL= "+clientServerRouterURL);
@@ -68,11 +65,6 @@ public class NCConfigFile {
 			this.pubSocketURL = pubSocketURL;
 		}
 
-		public String getRouterSocketURL() {
-			return routerSocketURL;
-		}
 
-		public void setRouterSocketURL(String routerSocketURL) {
-			this.routerSocketURL = routerSocketURL;
-		}
+
 }

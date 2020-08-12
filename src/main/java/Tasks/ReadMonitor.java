@@ -7,12 +7,13 @@ public class ReadMonitor extends Task{
 
 	private boolean all =false;
 	private String MetricName;
-	private List<AdminMetric> result= new ArrayList<AdminMetric>();
+	private List<influxdbMappingClass> result= new ArrayList<influxdbMappingClass>();
 	private boolean isInternalMetric=false;
 	private String internalMetricType;
-	private String internalMetricValue;
+	private String oneMetricResult;
 	private String rttInternalMetric;
 	private String internalMetricUniqueIdentifier;
+	
 	public boolean isAll() {
 		return all;
 	}
@@ -25,10 +26,10 @@ public class ReadMonitor extends Task{
 	public void setMetricName(String MetricName) {
 		this.MetricName = MetricName;
 	}
-	public List<AdminMetric> getResult() {
+	public List<influxdbMappingClass> getResult() {
 		return result;
 	}
-	public void setResult(List<AdminMetric> result) {
+	public void setResult(List<influxdbMappingClass> result) {
 		this.result = result;
 	}
 	
@@ -36,7 +37,7 @@ public class ReadMonitor extends Task{
 	@Override
 	public String toString () {
 		String r = "";
-		for(AdminMetric s: result) {
+		for(influxdbMappingClass s: result) {
 			r=r+", "+s.toString();
 		}
 		
@@ -61,16 +62,16 @@ public class ReadMonitor extends Task{
 		this.internalMetricType = internalMetricType;
 	}
 
-	public String getInternalMetricValue() {
-		return internalMetricValue;
-	}
-	public void setInternalMetricValue(String internalMetricValue) {
-		this.internalMetricValue = internalMetricValue;
-	}
 	public String getRttInternalMetric() {
 		return rttInternalMetric;
 	}
 	public void setRttInternalMetric(String rttInternalMetric) {
 		this.rttInternalMetric = rttInternalMetric;
+	}
+	public String getOneMetricResult() {
+		return oneMetricResult;
+	}
+	public void setOneMetricResult(String oneMetricResult) {
+		this.oneMetricResult = oneMetricResult;
 	}
 }

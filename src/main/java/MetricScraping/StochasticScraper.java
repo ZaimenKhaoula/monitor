@@ -7,10 +7,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.InfluxDB;
+import org.springframework.stereotype.Component;
 
 import Tasks.*;
+import pfe.mw.models.ApplicationRepository;
 
-
+@Component
 public class StochasticScraper extends Scraper{
 	long startTime;
 	long endTime;
@@ -18,8 +20,8 @@ public class StochasticScraper extends Scraper{
     Future<?> future;
 	
 	//constructeur de StochasticScraper... puisque la fonction run ne change pas on peut la mettre dans le consucteur
-	public StochasticScraper(ScheduledExecutorService runner, Task t,InfluxDB influxDB) {
-		super(runner, t, influxDB);
+	public StochasticScraper(ScheduledExecutorService runner, Task t,InfluxDB influxDB,ApplicationRepository app) {
+		super(runner, t, influxDB,app);
 		
 	}
 	 

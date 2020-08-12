@@ -7,16 +7,19 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.InfluxDB;
+import org.springframework.stereotype.Component;
 
 import Tasks.*;
+import pfe.mw.models.ApplicationRepository;
 
+@Component
 public class TimeSerieScraper extends Scraper {
 	long startTime;
 	long endTime;
     Future<?> future;
     
-	public TimeSerieScraper(ScheduledExecutorService runner, Task t,InfluxDB influxDB ) {
-		super(runner,t,influxDB);	
+	public TimeSerieScraper(ScheduledExecutorService runner, Task t,InfluxDB influxDB,ApplicationRepository app) {
+		super(runner,t,influxDB,app);	
 	}
 	
 	public void scrap()  {

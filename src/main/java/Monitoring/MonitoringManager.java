@@ -14,29 +14,29 @@ import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import org.influxdb.impl.InfluxDBResultMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import Alert.AlertGenerator;
 import MetricScraping.*;
 import Tasks.*;
-import pfe.mw.models.Application;
-import pfe.mw.models.ApplicationRepository;
-import pfe.mw.models.NCEM;
+import pfe.mw.models.*;
 
+
+@Service
 public class MonitoringManager  {
 
 	Map<String, Scraper> MonitoredMetrics;
-	private static ArrayList<AdminMetric> metricsCurrentValues= new ArrayList<AdminMetric>() ;
+    public static ArrayList<AdminMetric> metricsCurrentValues= new ArrayList<AdminMetric>() ;
 	Map<String,AlertGenerator> currentAlertGenerators; 
 	private ArrayList<Task> currentTasks;
-	private ArrayList<String> activeInternalMetrics;
 	ScheduledExecutorService threadPoolforScraping;
 	ScheduledExecutorService threadPoolToSendAlerts;
-	@Autowired
-	private ApplicationRepository appRepository;
+    @Autowired
+	ApplicationRepository appRepository;
 	InfluxDB influxDB;
-	String urlBD="http://192.168.5.51:8086";
+	String urlBD="http://localhost:8086";
 	public MonitoringManager() {
-		influxDB = InfluxDBFactory.connect(urlBD);
+		 influxDB = InfluxDBFactory.connect(urlBD);
 		 influxDB.query(new Query("CREATE DATABASE alertdb",""));
 		 influxDB.query(new Query("CREATE DATABASE metricdb",""));
 	      
@@ -45,146 +45,166 @@ public class MonitoringManager  {
 		currentAlertGenerators =new HashMap<String,AlertGenerator>();
 		currentTasks= new ArrayList<Task>();
 		MonitoredMetrics =new HashMap<String,Scraper>();
-		activeInternalMetrics=new ArrayList<String>();
-		
+		System.out.println("monitoringmanager created");
 	}
 
 	
 	public void taskProccessing(Task t){
 	     
 		
-		// start monitoring task
+		/**start scraping metrics**/
 		if(t instanceof CreateMonitor) {
 			currentTasks.add(t);
-			/* AdminMetric am= new AdminMetric(((CreateMonitor) t).getMetricName());
-			 am.setMetricName(((CreateMonitor) t).getMetricName());*/
-			((CreateMonitor) t).getAdminmetric().setExpression(((CreateMonitor) t).expressionToString());
+        System.out.println("++++Admin metric to scrap.."+((CreateMonitor) t).getAdminmetric().toString());
+    ((CreateMonitor) t).getAdminmetric().setExpression(((CreateMonitor) t).expressionToString());
 			 metricsCurrentValues.add(((CreateMonitor) t).getAdminmetric());
 			
 			
 			if(((CreateMonitor) t).getRate() instanceof PeriodicRate ) {
-				PeriodicScraper p = new PeriodicScraper(threadPoolforScraping,t,influxDB);
+				PeriodicScraper p = new PeriodicScraper(threadPoolforScraping,t,influxDB,appRepository);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
+				
 				p.scrap();
 			}
 			if(((CreateMonitor) t).getRate() instanceof StochasticRate ) {
 				
-				StochasticScraper p = new StochasticScraper(threadPoolforScraping, t,influxDB);
+				StochasticScraper p = new StochasticScraper(threadPoolforScraping, t,influxDB,appRepository);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
 				
 				p.scrap();
 			
 			}
 			if(((CreateMonitor) t).getRate() instanceof TimeSerieRate ) {
-				TimeSerieScraper p = new TimeSerieScraper(threadPoolforScraping,t,influxDB);
+				TimeSerieScraper p = new TimeSerieScraper(threadPoolforScraping,t,influxDB,appRepository);
 				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
 				p.scrap();
 			}
-				
-		}
+			t.setFinished(true);
+			}
 		
-		// stop monitoring task
+		/**stop monitoring task**/
         if(t instanceof DeleteMonitor) {
         		if (MonitoredMetrics.containsKey(((DeleteMonitor) t).getId()) ) {(MonitoredMetrics.get(((DeleteMonitor) t).getId())).cancelScraping();
         		 currentTasks.remove((DeleteMonitor) t);
         		MonitoredMetrics.remove(((DeleteMonitor) t).getId());}
-       
+       t.setFinished(true);
 		}
-      //SetMetricRate
+     /**set metric rate**/
         if(t instanceof UpdateMonitor) {
         	if (MonitoredMetrics.containsKey(((UpdateMonitor) t).getMetricName()) ) {
-        		CreateMonitor task = new CreateMonitor();
-        		 task=findMonitorById(((UpdateMonitor) t).getMetricName());
+        		CreateMonitor task =findMonitorById(((UpdateMonitor) t).getMetricName());
         		 task.setRate(((UpdateMonitor) t).getRate());
         		(MonitoredMetrics.get(((UpdateMonitor) t).getMetricName())).cancelScraping();
-        		MonitoredMetrics.remove(((DeleteMonitor) t).getId());
-        		if(((CreateMonitor) t).getRate() instanceof PeriodicRate ) {
-    				PeriodicScraper p = new PeriodicScraper(threadPoolforScraping,t,influxDB);
-    				MonitoredMetrics.put(((CreateMonitor) t).getAdminmetric().getMetricName(),p);
+        		MonitoredMetrics.remove(((UpdateMonitor) t).getId());
+        		for(Task t1: currentTasks) if(t1.getId()==task.getId()) currentTasks.remove(t1);
+        		currentTasks.add(task);	
+        		if( task.getRate() instanceof PeriodicRate ) {
+    				PeriodicScraper p = new PeriodicScraper(threadPoolforScraping,task,influxDB,appRepository);
+    				MonitoredMetrics.put(((CreateMonitor) task).getAdminmetric().getMetricName(),p);
     				p.scrap();
     			}
     			if(task.getRate() instanceof StochasticRate ) {
     				
-    				StochasticScraper p = new StochasticScraper(threadPoolforScraping, task,influxDB);
+    				StochasticScraper p = new StochasticScraper(threadPoolforScraping, task,influxDB,appRepository);
     				MonitoredMetrics.put(task.getAdminmetric().getMetricName(),p);
     				
     				p.scrap();
     			
     			}
     			if(task.getRate() instanceof TimeSerieRate ) {
-    				TimeSerieScraper p = new TimeSerieScraper(threadPoolforScraping,task,influxDB);
+    				TimeSerieScraper p = new TimeSerieScraper(threadPoolforScraping,task,influxDB,appRepository);
     				MonitoredMetrics.put(task.getAdminmetric().getMetricName(),p);
     				p.scrap();
     			}
         	
     		}
         	
-	     
+	     t.setFinished(true);
        }
         
-      //readMonitor is used to get all the adminMetrics or a specific adminMetric refrenced  
-     //by its name or it is used to get an internal metric value
+      /**readMonitor is used to get all the adminMetrics or a specific adminMetric refrenced  
+         by its name or it is used to get an internal metric value**/
        if(t instanceof ReadMonitor) {
     	   
     	 if(((ReadMonitor)t).isInternalMetric()) {
+    		 System.out.println("it is internal metric");
     		 MonitoringMessage msg= new MonitoringMessage(); 
     		 
     		 if(((ReadMonitor)t).getInternalMetricType().compareTo("counter")==0) {
     			 msg.setMetricType("counter");
-    		 String[] s= ((ReadMonitor)t).getInternalMetricUniqueIdentifier().split(".");
+    		  String[] s= ((ReadMonitor)t).getInternalMetricUniqueIdentifier().split(".");
+    		  msg.setMetricName(s[s.length-1]);
+              msg.setOp(OperationType.GetValue);
+        	((ReadMonitor)t).setOneMetricResult(sendMonitoringMessage(s[0],s[1],msg));}
     		
-    		msg.setMetricName(s[s.length-1]);
-    		 if(activeInternalMetrics.contains(s[s.length-1]))
-    	    {msg.setOp(OperationType.GetValue);
-    	((ReadMonitor)t).setInternalMetricValue(sendMonitoringMessage(s[0],s[1],msg));}
+    	  
     		 else {
-    			 msg.setOp(OperationType.EnableMetric);
-    			 sendMonitoringMessage(s[0],s[1],msg);
-    		     activeInternalMetrics.add(((ReadMonitor)t).getMetricName());
-    		 ((ReadMonitor)t).setInternalMetricValue("0.0");}
-    	 } 
-    		 else {if(((ReadMonitor)t).getInternalMetricType().compareTo("rtt")==0) {
+             /**measure rtt**/
     			 msg.setMetricType("rtt");
     			 String[] s= ((ReadMonitor)t).getRttInternalMetric().split(":");
     			 msg.setUrlDesMs(s[s.length-1]);
     			 String[] input=s[1].split("\\.");
         		 msg.setOp(OperationType.GetValue);			
-              ((ReadMonitor)t).setInternalMetricValue(sendMonitoringMessage(input[0],input[1],msg));
-        			 
-        		 
-        		 
+              ((ReadMonitor)t).setOneMetricResult(sendMonitoringMessage(input[0],input[1],msg));
+
     		 }
-    		 }
+    		
+    		 
     		 }
     	   
     	   
        else{ 
     	   if(((ReadMonitor)t).isAll()) {
     		   
-    	 QueryResult queryResult = influxDB.query(new Query("\"Select last(value), * from memory GROUP BY MetricName", "metricdb"));
+    	 QueryResult queryResult = influxDB.query(new Query("\"SELECT last(value), * FROM metrics GROUP BY name", "metricdb"));
     	 InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
-		List<AdminMetric> memoryPointList =  resultMapper
-	     .toPOJO(queryResult, AdminMetric.class);
+		List<influxdbMappingClass> memoryPointList =  resultMapper
+	     .toPOJO(queryResult, influxdbMappingClass.class);
 		((ReadMonitor)t).setResult(memoryPointList);
 
     	   }
     	   else {
     		
     		   
-   			QueryResult queryResult = influxDB.query(new Query("Select last(value), * from memory where MetricName = \'"+((ReadMonitor)t).getMetricName()+"\'", "metricdb"));
-			  
-			 
+   		    QueryResult queryResult = influxDB.query(new Query("SELECT  * FROM metrics WHERE name = \'"+((ReadMonitor)t).getMetricName()+"\' ORDER BY time DESC", "metricdb"));
 			InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
-			AdminMetric memoryPointList = (AdminMetric) resultMapper
-			  .toPOJO(queryResult, AdminMetric.class);
-			((ReadMonitor)t).getResult().add(memoryPointList);
-			((ReadMonitor)t).setInternalMetricValue(memoryPointList.getValue().toString());
+			List<influxdbMappingClass> memoryPointList = resultMapper
+			  .toPOJO(queryResult, influxdbMappingClass.class);
+			((ReadMonitor)t).setResult(memoryPointList);
+			((ReadMonitor)t).setOneMetricResult(memoryPointList.get(0).getValue().toString());
     	       }
 	
-            }}
+            }
+    	 
+ 	    t.setFinished(true);
+       }
+       
+       
+       if(t instanceof DirectOpOnInternalMetric) {
+    	   
+    	   String[] s= ((DirectOpOnInternalMetric)t).getInternalMetric().split(".");
+    	   MonitoringMessage msg= new MonitoringMessage(); 
+    		 msg.setMetricType("counter");
+    		msg.setMetricName(s[s.length-1]);
+    	   switch( ((DirectOpOnInternalMetric)t).getOperation()) {
+    	   case "disable":
+    		  msg.setOp(OperationType.DisableMetric); 
+    		  break;
+    	   case "enable":
+    		   msg.setOp(OperationType.EnableMetric); 
+    	       break;
+    	   case "reset":
+    		   msg.setOp(OperationType.Reset); 
+    		   break;
+    	   default:
+    	   }
+    	 String result=  sendMonitoringMessage(s[0],s[1],msg);
+    	 if(result.compareTo("ok")==0) t.setFinished(true);
+    	   
+       }
     
         
-        // create Notifier Task
+       /**create Notifier Task**/
         if(t instanceof CreateNotifier) {
         	currentTasks.add(t);
         
@@ -203,12 +223,13 @@ public class MonitoringManager  {
 	    		}
 	    	}
 	     }
-         a.start();
+         a.generateAlert();
 	    this.currentAlertGenerators.put(((CreateNotifier)t).getId(),a);
+	    t.setFinished(true);
         }
         
         
-     // stop Notifier task
+     /**stop Notifier task**/
         if(t instanceof DeleteNotifier) {
         	
         	
@@ -218,7 +239,7 @@ public class MonitoringManager  {
 		}
         
         
-        //Read Notifier Task
+        /**Read Notifier Task**/
         
         if(t instanceof ReadNotifier) {
         	
@@ -241,20 +262,13 @@ public class MonitoringManager  {
      		    }
      		   
      	       }
-        	
+    	    t.setFinished(true);
         }
         
 	}    
 
 
-	public static ArrayList<AdminMetric> getMetricsCurrentValues() {
-		return metricsCurrentValues;
-	}
-
-
-	public static void setMetricsCurrentValues(ArrayList<AdminMetric> metricsCurrentValues) {
-		MonitoringManager.metricsCurrentValues = metricsCurrentValues;
-	}
+	
 
 
 	public Map<String, AlertGenerator> getCurrentAlertGenerators() {
@@ -335,4 +349,5 @@ public class MonitoringManager  {
 	}
 	
 	
-}
+	}
+

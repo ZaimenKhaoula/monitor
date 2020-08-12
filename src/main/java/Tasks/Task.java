@@ -2,6 +2,7 @@ package Tasks;
 
 public abstract class Task {
 	protected String id;
+	protected boolean finished;
 
 	public String getId() {
 		return id;
@@ -19,5 +20,10 @@ public abstract class Task {
 	    }
 	    return false;
 	}
-	
+	public boolean isFinished() {
+		return finished;
+	}
+	public void setFinished(boolean b) {
+		finished =b;
+	}
 }

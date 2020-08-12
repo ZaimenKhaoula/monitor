@@ -17,6 +17,11 @@ private  int idCounter = 0;
     case createN:
       CreateNotifierResource();
       break;
+    case RTT:
+    case MetricName:
+    case Id:
+      ReadMonitoringResource();
+      break;
     default:
       jj_la1[0] = jj_gen;
       jj_consume_token(-1);
@@ -161,7 +166,7 @@ ReadMonitor task = new ReadMonitor();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case MetricName:
       tok1 = jj_consume_token(MetricName);
-                    task.setMetricName(tok1.toString());
+                    task.setMetricName(tok1.toString());System.out.println("inside analyser  read monitor");
       break;
     case RTT:
       tok1 = jj_consume_token(RTT);
@@ -178,13 +183,13 @@ ReadMonitor task = new ReadMonitor();
     case Id:
       tok1 = jj_consume_token(Id);
           task.setInternalMetricType("counter");task.setInternalMetricUniqueIdentifier(tok1.toString());task.setInternalMetric(true);
-  {if (true) return task;}
       break;
     default:
       jj_la1[7] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+  {if (true) return task;}
     throw new Error("Missing return statement in function");
   }
 
@@ -197,7 +202,7 @@ ReadMonitor task = new ReadMonitor();
     jj_consume_token(createM);
     jj_consume_token(grammarkeyWords);
     tok1 = jj_consume_token(MetricName);
-                                                  task.getAdminmetric().setMetricName(tok1.toString()); task.setId(tok1.toString());
+         task.getAdminmetric().setMetricName(tok1.toString()); task.setId(tok1.toString());
     jj_consume_token(operateur);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case number:
@@ -231,8 +236,8 @@ ReadMonitor task = new ReadMonitor();
             break;
           case Id:
             tok1 = jj_consume_token(Id);
-               counter.setIdMs(tok1.toString());
-     task.getExpression().add(counter.getIdMs()+"."+counter.getMetricName()); task.getAdminmetric().getMetrics().add(counter);
+               Counter counter1 = new Counter(); counter1.setIdMs(tok1.toString());
+     task.getExpression().add(counter1.getIdMs()+"."+counter1.getMetricName()); task.getAdminmetric().getMetrics().add(counter1);
             break;
           default:
             jj_la1[9] = jj_gen;
@@ -317,12 +322,12 @@ ReadMonitor task = new ReadMonitor();
               jj_consume_token(RTT);
               jj_consume_token(separateur);
               tok1 = jj_consume_token(Idms);
-                               System.out.println(tok1.toString());rtt.setIDusSource(tok1.toString());
+                               System.out.println(tok1.toString());RTT rtt1 =new RTT(); rtt1.setIDusSource(tok1.toString());
               jj_consume_token(separateur);
               tok1 = jj_consume_token(Idms);
- System.out.println(tok1.toString());rtt.setIDusDestination(tok1.toString());
-                                                                                task.getExpression().add(rtt.toString());
-                                                                                                                           (task.getAdminmetric()).getMetrics().add(rtt);
+ System.out.println(tok1.toString());rtt1.setIDusDestination(tok1.toString());
+                                                                                 task.getExpression().add(rtt1.toString());
+                                                                                                                             (task.getAdminmetric()).getMetrics().add(rtt1);
               break;
             default:
               jj_la1[15] = jj_gen;
@@ -458,12 +463,12 @@ ReadMonitor task = new ReadMonitor();
                   jj_consume_token(RTT);
                   jj_consume_token(separateur);
                   tok1 = jj_consume_token(Idms);
-                                                                                           rtt.setIDusSource(tok1.toString());
+                                                                                           RTT rtt2 = new RTT(); rtt2.setIDusSource(tok1.toString());
                   jj_consume_token(separateur);
                   tok1 = jj_consume_token(Idms);
- rtt.setIDusDestination(tok1.toString());
-                                            task.getExpression().add(rtt.toString());
-                                                                                       task.getAdminmetric().getMetrics().add(rtt);
+ rtt2.setIDusDestination(tok1.toString());
+                                             task.getExpression().add(rtt2.toString());
+                                                                                         task.getAdminmetric().getMetrics().add(rtt2);
                   break;
                 default:
                   jj_la1[27] = jj_gen;
@@ -491,12 +496,12 @@ ReadMonitor task = new ReadMonitor();
                     jj_consume_token(RTT);
                     jj_consume_token(separateur);
                     tok1 = jj_consume_token(Idms);
-                               rtt.setIDusSource(tok1.toString());
+                               RTT rtt3 =new RTT(); rtt3.setIDusSource(tok1.toString());
                     jj_consume_token(separateur);
                     tok1 = jj_consume_token(Idms);
- rtt.setIDusDestination(tok1.toString());
-                                            task.getExpression().add(rtt.toString());
-                                                                                       task.getAdminmetric().getMetrics().add(rtt);
+ rtt3.setIDusDestination(tok1.toString());
+                                             task.getExpression().add(rtt3.toString());
+                                                                                         task.getAdminmetric().getMetrics().add(rtt3);
                     break;
                   default:
                     jj_la1[29] = jj_gen;
@@ -674,7 +679,7 @@ ReadMonitor task = new ReadMonitor();
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x700000,0x2000000,0x2000000,0x1000,0xe0000,0x22000000,0x20,0xa0008000,0x20,0x82000000,0x82000000,0x40,0x40,0x2008000,0x20,0x2008000,0x400,0x2008000,0x200,0x400,0x2008040,0x200,0x20,0x40,0x100,0x40,0x100,0x2008000,0x20,0x2008000,0x2008000,0x200,0x2008140,0x400,0x200,0x2008140,0x2008140,0x82008040,0x2000000,0x2000000,0x1000,0xe0000,};
+      jj_la1_0 = new int[] {0xa0708000,0x2000000,0x2000000,0x1000,0xe0000,0x22000000,0x20,0xa0008000,0x20,0x82000000,0x82000000,0x40,0x40,0x2008000,0x20,0x2008000,0x400,0x2008000,0x200,0x400,0x2008040,0x200,0x20,0x40,0x100,0x40,0x100,0x2008000,0x20,0x2008000,0x2008000,0x200,0x2008140,0x400,0x200,0x2008140,0x2008140,0x82008040,0x2000000,0x2000000,0x1000,0xe0000,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
