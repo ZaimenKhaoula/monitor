@@ -5,7 +5,7 @@ import java.net.URL;
 public class NotifierModel {
 	
 	private String expression;
-	private URL urlToSendAlert;
+	private String urlToSendAlert;
 	
 
 	public String getExpression() {
@@ -14,10 +14,10 @@ public class NotifierModel {
 	public void setExpression(String expression) {
 		this.expression = expression;
 	}
-	public URL getUrlToSendAlert() {
+	public String getUrlToSendAlert() {
 		return urlToSendAlert;
 	}
-	public void setUrlToSendAlert(URL urlToSendAlert) {
+	public void setUrlToSendAlert(String urlToSendAlert) {
 		this.urlToSendAlert = urlToSendAlert;
 	}
 	

@@ -34,10 +34,10 @@ private  int idCounter = 0;
   Token tok1=null;
   Token tok2=null;
     jj_consume_token(updateM);
-    tok1 = jj_consume_token(Id);
-                    task.setMetricName(tok1.toString());
+    tok1 = jj_consume_token(MetricName);
+                            task.setMetricName(tok1.toString());
+    jj_consume_token(separateur);
     jj_consume_token(grammarkeyWords);
-    jj_consume_token(sym);
     jj_consume_token(operateur);
     jj_consume_token(grammarkeyWords);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -166,7 +166,7 @@ ReadMonitor task = new ReadMonitor();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case MetricName:
       tok1 = jj_consume_token(MetricName);
-                    task.setMetricName(tok1.toString());System.out.println("inside analyser  read monitor");
+                    task.setMetricName(tok1.toString());
       break;
     case RTT:
       tok1 = jj_consume_token(RTT);
@@ -679,7 +679,7 @@ ReadMonitor task = new ReadMonitor();
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xa0708000,0x2000000,0x2000000,0x1000,0xe0000,0x22000000,0x20,0xa0008000,0x20,0x82000000,0x82000000,0x40,0x40,0x2008000,0x20,0x2008000,0x400,0x2008000,0x200,0x400,0x2008040,0x200,0x20,0x40,0x100,0x40,0x100,0x2008000,0x20,0x2008000,0x2008000,0x200,0x2008140,0x400,0x200,0x2008140,0x2008140,0x82008040,0x2000000,0x2000000,0x1000,0xe0000,};
+      jj_la1_0 = new int[] {0xc0708000,0x4000000,0x4000000,0x1000,0xe0000,0x44000000,0x20,0xc0008000,0x20,0x84000000,0x84000000,0x40,0x40,0x4008000,0x20,0x4008000,0x400,0x4008000,0x200,0x400,0x4008040,0x200,0x20,0x40,0x100,0x40,0x100,0x4008000,0x20,0x4008000,0x4008000,0x200,0x4008140,0x400,0x200,0x4008140,0x4008140,0x84008040,0x4000000,0x4000000,0x1000,0xe0000,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
@@ -799,7 +799,7 @@ ReadMonitor task = new ReadMonitor();
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[34];
+    boolean[] la1tokens = new boolean[33];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -816,7 +816,7 @@ ReadMonitor task = new ReadMonitor();
         }
       }
     }
-    for (int i = 0; i < 34; i++) {
+    for (int i = 0; i < 33; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

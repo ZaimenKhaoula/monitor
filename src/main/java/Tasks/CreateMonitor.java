@@ -45,7 +45,7 @@ public class CreateMonitor extends Task{
 	public String expressionToString() {
 	 String a="";
 	 for (String m : expression) {
-	  a=a+m+":";	 
+	  a=a+m;	 
 	 }
 	 return a;
 	}

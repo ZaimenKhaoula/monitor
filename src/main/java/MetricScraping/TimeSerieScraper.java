@@ -38,7 +38,7 @@ public class TimeSerieScraper extends Scraper {
 		
 		 int i=1;
 		
-		 while(isEnable()==true && i<(((TimeSerieRate)(task.getRate())).getParameters()).size()) {
+		 while(isEnable()==true && i<(((TimeSerieRate)(task.getRate())).getParameters()).size()+1) {
 			 
 			 startTime = System.currentTimeMillis();
 			 future= runner.submit(scrap);
@@ -51,7 +51,7 @@ public class TimeSerieScraper extends Scraper {
 			}
 			 waitNextScrap(i);
 			 i=i+2;}
-		 future= runner.submit(scrap);
+		// future= runner.submit(scrap);
 	}
 	
 	

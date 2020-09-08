@@ -15,7 +15,7 @@ public class Counter  extends InternalMetric{
 	@Override 
 	public String 	toString() {
 	
-		return 	"counter*"+MetricName+"*"+getIdMs()+"*"+Value;
+		return 	"counter|"+MetricName+"|"+getIdMs()+"|"+Value;
 			
 	}
 	public String getIdMs() {

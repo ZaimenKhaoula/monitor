@@ -55,14 +55,14 @@ public class AdminMetric {
 			return s;
 	    }
 	    public String toSave() {
-	    	return MetricName+"-"+type+"-"+Double.toString(value)
-	    			+"-"+expression;
+	    	return MetricName+"#"+type+"#"+Double.toString(value)
+	    			+"#"+expression;
 	    }
 	    
 		@Override
 		public String toString() {
 			
-			return toSave()+"-"+internelmerticsToString();
+			return toSave()+"#"+internelmerticsToString();
 		}
 		public String getType() {
 			return type;

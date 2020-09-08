@@ -149,6 +149,7 @@ public class NCEM {
 								shaperConf.addProperty("shaperDealerSocketURL", "tcp://" + SHAPER_IP_ADDRESS + ":2222");
 								shaperConf.addProperty("ncemConfSocketURL", pubSocketURL);
 								shaperConf.addProperty("id", nc.getId() + "Shaper");
+								shaperConf.addProperty("policy", gson.toJson(nc.getShaper().getPolicy()));
 								socket.send(gson.toJson(shaperConf).getBytes(ZMQ.CHARSET), 0);
 
 							} else {
@@ -163,6 +164,7 @@ public class NCEM {
 											"tcp://" + SHAPER_IP_ADDRESS + ":2222");
 									classifierConf.addProperty("ncemConfSocketURL", pubSocketURL);
 									classifierConf.addProperty("id", nc.getId() + "Classifier");
+									classifierConf.addProperty("policy", gson.toJson(nc.getClassifier().getPolicy()));
 									socket.send(gson.toJson(classifierConf).getBytes(ZMQ.CHARSET), 0);
 
 								} else {
@@ -840,15 +842,16 @@ public class NCEM {
 
 	
     public String sendMonitoringMsg(String des, String msg) {
-    	System.out.println("ncem of  general controler ...inside sendmonitoringMsg with info des is "+des+" and msg is.."+msg);
+     
     	ZMQ.Socket MonitoringSocket=null;
     	ZContext contextUsedToContactMsForMonitoring;
 	    String sourceOfResponse;
 	    String url= correspondenceTableIdMsMonitoringURL.get(des);
-	    System.out.println("looking for url in correspondence table and url found for des  "+des+" is "+url);
+	    System.out.println("Ncem is looking for monitoring url of microservice = "+des+" in correspondence table");
+	    System.out.println("the monitoring url found for des  "+des+" is "+url);
 		String replyFromMS=null;
 		try{
-			System.out.println("trying to connect to  url of ms "+des);
+		
 		contextUsedToContactMsForMonitoring = new ZContext();
 		MonitoringSocket = contextUsedToContactMsForMonitoring.createSocket(SocketType.REQ);
 		
@@ -858,18 +861,17 @@ public class NCEM {
 		while (replyFromMS == null) {
 			MonitoringSocket.sendMore(des);
 			MonitoringSocket.send(msg);
-			System.out.println("from ncem.... send monitoring msg to "+des+" get response "+msg);
+			System.out.println("Send monitoring msg to "+des+" with content "+msg);
 	        sourceOfResponse = MonitoringSocket.recvStr();
 	        replyFromMS = MonitoringSocket.recvStr();
-	        System.out.println("from ncem.... recieved monitoring msg to "+des+" get response "+replyFromMS);
-			
+	        System.out.println("recieved response "+replyFromMS+" from microservice"+des);
 		
 
 	}
 		
 		MonitoringSocket.disconnect(url);
 		MonitoringSocket.close();
-		System.out.println("disconnected from url");
+		System.out.println("ncem disconnected from url");
 		return replyFromMS;
 	}
     

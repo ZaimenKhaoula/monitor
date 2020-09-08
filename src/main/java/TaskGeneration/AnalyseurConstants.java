@@ -33,7 +33,7 @@ public interface AnalyseurConstants {
   /** RegularExpression Id. */
   int RTT = 15;
   /** RegularExpression Id. */
-  int timeUnit = 16;
+  int url = 16;
   /** RegularExpression Id. */
   int periodic = 17;
   /** RegularExpression Id. */
@@ -51,23 +51,21 @@ public interface AnalyseurConstants {
   /** RegularExpression Id. */
   int Metric = 24;
   /** RegularExpression Id. */
-  int number = 25;
+  int timeUnit = 25;
   /** RegularExpression Id. */
-  int DIGIT = 26;
+  int number = 26;
   /** RegularExpression Id. */
-  int alpha = 27;
+  int DIGIT = 27;
   /** RegularExpression Id. */
-  int AppName = 28;
+  int alpha = 28;
   /** RegularExpression Id. */
-  int MetricName = 29;
+  int AppName = 29;
   /** RegularExpression Id. */
-  int param = 30;
+  int MetricName = 30;
   /** RegularExpression Id. */
   int Id = 31;
   /** RegularExpression Id. */
   int Idms = 32;
-  /** RegularExpression Id. */
-  int url = 33;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -90,7 +88,7 @@ public interface AnalyseurConstants {
     "\"{\"",
     "\"}\"",
     "\"RTT\"",
-    "<timeUnit>",
+    "<url>",
     "\"periodic\"",
     "\"stochastic\"",
     "\"time-serie\"",
@@ -99,15 +97,14 @@ public interface AnalyseurConstants {
     "\"CreateNotifier\"",
     "<loi>",
     "<Metric>",
+    "<timeUnit>",
     "<number>",
     "<DIGIT>",
     "<alpha>",
     "<AppName>",
     "<MetricName>",
-    "<param>",
     "<Id>",
     "<Idms>",
-    "<url>",
   };
 
 }

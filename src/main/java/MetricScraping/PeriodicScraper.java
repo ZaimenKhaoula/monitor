@@ -21,7 +21,7 @@ public class PeriodicScraper extends  Scraper {
 	
 
 	public void scrap() {
-		 System.out.println("inside periodic scraper");
+	
 			if(isEnable())
 			futureTask = runner.scheduleAtFixedRate(scrap,0,period(), unit());
 		   

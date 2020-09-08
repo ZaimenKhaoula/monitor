@@ -37,17 +37,17 @@ public void setMetrics(ArrayList<AdminMetric> metrics) {
 // save the alert as string in the knowledge base
 
 public String alertInfo(){
-	return "Alert+"+type+"+"+appName+"+"+AlertExpression+"+"+threshold;
+	return  type+"$"+appName+"$"+AlertExpression+"$"+threshold;
 }
 
 @Override
 public String toString() {
 	 String metric ="";
 	for(AdminMetric m: metrics) {
-	metric=metric+m.toString()+"-";
+	metric=metric+m.toString()+"$";
 	}
 
-	return alertInfo()+"+"+metric;
+	return alertInfo()+"$"+metric;
 	
 }
 public String getThreshold() {
@@ -62,6 +62,7 @@ public String getAppName() {
 public void setAppName(String appName) {
 	this.appName = appName;
 }
+
 
 
 

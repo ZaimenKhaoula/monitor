@@ -114,7 +114,7 @@ public class AlertGenerator implements PropertyChangeListener {
 		if(isEnable()) {
 		for (AdminMetric m : metrics)
 		{
-			if (m.getMetricName()==evt.getPropertyName())
+			if (m.getMetricName().compareTo(evt.getPropertyName())==0)
 				 m.setValue((Double)evt.getNewValue());
 		}	
 		
@@ -137,7 +137,7 @@ public class AlertGenerator implements PropertyChangeListener {
 			}
 		}
 		
-		System.out.println(result);
+		System.out.println("replacing values in alert expression..."+result);
 		return result; 
 	}
 	
@@ -149,7 +149,7 @@ public class AlertGenerator implements PropertyChangeListener {
 		while(!found && i<metrics.size()) {
 			if(metrics.get(i).getMetricName().compareTo(s)==0) {
 				found=true;
-				System.out.println(s+"   "+Double.toString(metrics.get(i).getValue()));
+				System.out.println("the value of metric : "+s+" is "+Double.toString(metrics.get(i).getValue()));
 				return Double.toString(metrics.get(i).getValue());
 			}
 			i++;
@@ -167,6 +167,16 @@ public class AlertGenerator implements PropertyChangeListener {
 	public void sendAlert(String alert) {
 		{
 
+			System.out.println();
+			System.out.println("*********************AlertGenerator******************");
+			System.out.println("The observed alert expression : "+notifier.expressionToString()+ " is verified");
+			System.out.println("Generating alert...");
+			System.out.println("Send alert to the following url "+notifier.getUrl());
+			System.out.println("******************************************************");
+			System.out.println();
+			System.out.println();
+			System.out.println();
+			System.out.println();
 	        HttpPost post = new HttpPost(notifier.getUrl());
 
 	      

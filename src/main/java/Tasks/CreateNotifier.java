@@ -40,13 +40,13 @@ public class CreateNotifier extends Task{
 	public String expressionToString() {
 		String s="";
 		for(String st: expression ) {
-			s=s+st+":";
+			s=s+st;
 		}
 		return s;
 	}
 	@Override
 	public String toString() {
-		return id+" expression :"+expressionToString()+" AlertUrl :"+url;
+		return id+" expression "+expressionToString()+" AlertUrl "+url;
 		
 	}
 	

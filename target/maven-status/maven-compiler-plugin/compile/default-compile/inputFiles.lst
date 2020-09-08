@@ -1,3 +1,4 @@
+/home/khaoula/Documents/monitorCloned/monitor/src/main/java/Alert/influxdbAlertMapping.java
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/Tasks/InternalMetric.java
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/pfe/mw/models/ShaperPolicy.java
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/monitoringApi/MAIN.java
@@ -58,6 +59,7 @@
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/pfe/mw/models/ClassOperation.java
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/Tasks/StochasticRate.java
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/TaskGeneration/Analyseur.java
+/home/khaoula/Documents/monitorCloned/monitor/src/main/java/Tasks/influxdbMappingClass.java
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/Tasks/AdminMetric.java
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/TaskGeneration/Token.java
 /home/khaoula/Documents/monitorCloned/monitor/src/main/java/Monitoring/OperationType.java

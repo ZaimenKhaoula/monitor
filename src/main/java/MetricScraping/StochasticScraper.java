@@ -35,16 +35,24 @@ public class StochasticScraper extends Scraper{
 		 while(isEnable()==true) {
 			 startTime = System.currentTimeMillis();
 			 future= runner.submit(scrap);
-
+  
 		
 				try {
+					
 					future.get();
 				} catch (InterruptedException | ExecutionException e) {
 					
+					
 				} 
        			    endTime = System.currentTimeMillis();
-					waitNextScrap();
-				
+					try {
+						 
+						waitNextScrap();
+						
+					} catch (InterruptedException e) {
+						System.out.println("exception in waiting stocastic");
+					}
+					
 			}	 
 	 
    }
@@ -54,18 +62,18 @@ public class StochasticScraper extends Scraper{
 		 if(((StochasticRate) (task.getRate())).getLoi()=="uniform")
 		      return (long) (Math.random()*Long.parseLong(period));	 
 		 else /*(((StochasticRate) (t.getRate())).getLoi()=="exponential")*/
-	   	  		
+	   
 			return (long) ((-Math.log(Math.random()))/Double.parseDouble((task.getRate()).getParameters().get(0)));	 
 
 	}
 	
 	
-	public void waitNextScrap()
+	public void waitNextScrap() throws InterruptedException
 	{
-		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("us")==0)
+		/*if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("us")==0)
 			try {
 				if((endTime - startTime)*1000>period())
-					TimeUnit.MILLISECONDS.sleep(0);
+					TimeUnit.MILLISECONDS.sleep(period()/1000);
 				else
 				TimeUnit.MICROSECONDS.sleep(period()-(endTime - startTime)*1000);
 			} catch (InterruptedException e) {
@@ -85,7 +93,7 @@ public class StochasticScraper extends Scraper{
 		else {if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("s")==0)
 			try {
 				if((endTime - startTime)/1000>period())
-					TimeUnit.MILLISECONDS.sleep(0);
+					TimeUnit.SECONDS.sleep(period());
 				else
 				TimeUnit.SECONDS.sleep(period()-(endTime - startTime)/1000);
 			} catch (InterruptedException e) {
@@ -112,9 +120,43 @@ public class StochasticScraper extends Scraper{
 			} catch (InterruptedException e) {
 				
 			}
-		}}}}
+		}}}}*/
 		
-	}
+		long p= period();
+		while(p==0) {
+			p=period();
+		}
+		System.out.println("the next scraping will start aftar .."+p+((StochasticRate)(task.getRate())).getParameters().get(1));
+		
+		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("us")==0)
+
+				TimeUnit.MICROSECONDS.sleep(p);
+		
+			
+		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("ms")==0)
+			
+				TimeUnit.MILLISECONDS.sleep(p);
+		
+		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("s")==0)
+		{
+				TimeUnit.SECONDS.sleep(p);
+				
+		}
+		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("min")==0)
+			
+				TimeUnit.MINUTES.sleep(p);
+			
+		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("h")==0)
+			
+				TimeUnit.HOURS.sleep(p);
+			
+		if(((StochasticRate)(task.getRate())).getParameters().get(1).compareTo("jr")==0)
+		
+				TimeUnit.DAYS.sleep(p);
+			
+		}
+		
+
 	
 	
 	public void cancelScraping() {

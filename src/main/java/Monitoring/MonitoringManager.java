@@ -55,6 +55,7 @@ public class MonitoringManager  {
 		/**start scraping metrics**/
 		if(t instanceof CreateMonitor) {
 			currentTasks.add(t);
+			((CreateMonitor) t).getAdminmetric().setExpression(((CreateMonitor) t).expressionToString());
         System.out.println("++++Admin metric to scrap.."+((CreateMonitor) t).getAdminmetric().toString());
     ((CreateMonitor) t).getAdminmetric().setExpression(((CreateMonitor) t).expressionToString());
 			 metricsCurrentValues.add(((CreateMonitor) t).getAdminmetric());
@@ -94,15 +95,21 @@ public class MonitoringManager  {
      /**set metric rate**/
         if(t instanceof UpdateMonitor) {
         	if (MonitoredMetrics.containsKey(((UpdateMonitor) t).getMetricName()) ) {
-        		CreateMonitor task =findMonitorById(((UpdateMonitor) t).getMetricName());
-        		 task.setRate(((UpdateMonitor) t).getRate());
+        		
+        		if(findMonitorById(((UpdateMonitor) t).getMetricName())!= null)
+        		{
+        		CreateMonitor task =new CreateMonitor();
+        		task.setAdminmetric(findMonitorById(((UpdateMonitor) t).getMetricName()).getAdminmetric());
+        		task.setExpression(findMonitorById(((UpdateMonitor) t).getMetricName()).getExpression());
+        		task.setId(findMonitorById(((UpdateMonitor) t).getMetricName()).getId());
+        		task.setRate(((UpdateMonitor) t).getRate());
         		(MonitoredMetrics.get(((UpdateMonitor) t).getMetricName())).cancelScraping();
         		MonitoredMetrics.remove(((UpdateMonitor) t).getId());
         		for(Task t1: currentTasks) if(t1.getId()==task.getId()) currentTasks.remove(t1);
         		currentTasks.add(task);	
         		if( task.getRate() instanceof PeriodicRate ) {
     				PeriodicScraper p = new PeriodicScraper(threadPoolforScraping,task,influxDB,appRepository);
-    				MonitoredMetrics.put(((CreateMonitor) task).getAdminmetric().getMetricName(),p);
+    				MonitoredMetrics.put(task.getAdminmetric().getMetricName(),p);
     				p.scrap();
     			}
     			if(task.getRate() instanceof StochasticRate ) {
@@ -118,7 +125,7 @@ public class MonitoringManager  {
     				MonitoredMetrics.put(task.getAdminmetric().getMetricName(),p);
     				p.scrap();
     			}
-        	
+        	}
     		}
         	
 	     t.setFinished(true);
@@ -134,7 +141,7 @@ public class MonitoringManager  {
     		 
     		 if(((ReadMonitor)t).getInternalMetricType().compareTo("counter")==0) {
     			 msg.setMetricType("counter");
-    		  String[] s= ((ReadMonitor)t).getInternalMetricUniqueIdentifier().split(".");
+    		  String[] s= ((ReadMonitor)t).getInternalMetricUniqueIdentifier().split("\\.");
     		  msg.setMetricName(s[s.length-1]);
               msg.setOp(OperationType.GetValue);
         	((ReadMonitor)t).setOneMetricResult(sendMonitoringMessage(s[0],s[1],msg));}
@@ -184,7 +191,7 @@ public class MonitoringManager  {
        
        if(t instanceof DirectOpOnInternalMetric) {
     	   
-    	   String[] s= ((DirectOpOnInternalMetric)t).getInternalMetric().split(".");
+    	   String[] s= ((DirectOpOnInternalMetric)t).getInternalMetric().split("\\.");
     	   MonitoringMessage msg= new MonitoringMessage(); 
     		 msg.setMetricType("counter");
     		msg.setMetricName(s[s.length-1]);
@@ -214,11 +221,12 @@ public class MonitoringManager  {
 	     for(String s :((CreateNotifier)t).getMetrics())
 	     {
 	    	for(AdminMetric am : metricsCurrentValues) {
-	    		if(am.getMetricName()==s) {
+	    		if(am.getMetricName().compareTo(s)==0) {
 	    			AdminMetric metric=new AdminMetric();
 	    			metric.setMetricName(s);
 	    			metric.setMetrics(am.getMetrics());
 	    			metric.setValue(am.getValue());
+	    			metric.setExpression(am.getExpression());
 	    			metric.setType(am.getType());
 	    			a.getMetrics().add(metric);
 	    			am.addPropertyChangeListener(a);

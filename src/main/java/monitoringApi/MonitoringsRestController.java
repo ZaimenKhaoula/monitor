@@ -43,14 +43,19 @@ public class MonitoringsRestController {
 	
 	@GetMapping("/monitorings")
 	public List<influxdbMappingClass> getAllMonitoringTasks() {
+		long startTime;
+		long endTime;
+		 startTime = System.currentTimeMillis();
        ReadMonitor reader = new ReadMonitor();
        reader.setAll(true);
 	   monitorManager.taskProccessing(reader);
+	   endTime = System.currentTimeMillis();
+	   System.out.println("temps necessaire pourla lecture des donnees :"+(endTime-startTime));
 	  return reader.getResult();
 		
 	}
 	
-	@GetMapping("/monitorings/{MetricName}")
+	@GetMapping("/monitorings/{MetricName}/{limit}")
 	public  ResponseEntity<?> getMonitoringTask(@PathVariable(required = true) String MetricName,@PathVariable(required = true) int limit) throws InterruptedException, ParseException {
 		is = new ByteArrayInputStream(MetricName.getBytes());
 		if (parser==null) parser= new Analyseur(is); 
@@ -58,8 +63,10 @@ public class MonitoringsRestController {
 		ReadMonitor r = new ReadMonitor();
 		r.setLimit(limit);
 		r=parser.ReadMonitoringResource();
-		
+		Long start= System.currentTimeMillis();
 		monitorManager.taskProccessing(r);
+		Long end= System.currentTimeMillis();
+		 System.out.println("temps necessaire pourla lecture  d'une metrique specifique :"+(end-start));
 		if(r.isFinished()) {
            if(r.isInternalMetric()==false)
 		 return new ResponseEntity<>(r.getResult(), HttpStatus.OK);
@@ -75,30 +82,36 @@ public class MonitoringsRestController {
 		is = new ByteArrayInputStream((monitor.toString()).getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
+		long startTime= System.currentTimeMillis();
 		monitorManager.taskProccessing(parser.CreateMonitoringResource());
+		long endTime= System.currentTimeMillis();
+		 System.out.println("temps necessaire pour post metric :"+(endTime-startTime));
 		return new ResponseEntity<>("start scraping metric...", HttpStatus.OK);
 	}
 	
 	
 	@PatchMapping("/monitorings/update/{MetricName}")
-	public ResponseEntity<String> updateMonitoringTask(@PathVariable String MetricName ,@RequestBody RateModel newRate){
+	public ResponseEntity<String> updateMonitoringTask(@PathVariable String MetricName ,@RequestBody RateModel newRate) throws ParseException{
 		
-		operation="UpdateMonitor"+MetricName+newRate.toString();
+	/*	operation="UpdateMonitor "+MetricName+newRate.toString();
 		is = new ByteArrayInputStream(operation.getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
-		UpdateMonitor m=null;
-		
-		try {
-			m=parser.UpdateMonitoringResource();
+
+		long startTime=0;
+		long endTime=0;
+
+	 	startTime= System.currentTimeMillis();
+	 	UpdateMonitor m=parser.UpdateMonitoringResource();
 			monitorManager.taskProccessing(m);
-		} catch (ParseException e) {
-			
-		}
-		if(m.isFinished())
+			endTime= System.currentTimeMillis();
+		
+		System.out.println("temps necessaire pourla lecture  d'une metrique specifique :"+(endTime-startTime));*/
+	
+	
 	     	return new ResponseEntity<> ("MonitoringRessource Updated" , HttpStatus.OK);
-		 else 
-				return new ResponseEntity<String>("operation failed", HttpStatus.BAD_REQUEST);
+
+	
 	}
 	
 	@DeleteMapping("/monitorings/delete/{MetricName}")
@@ -190,9 +203,12 @@ public ResponseEntity<String> deleteMonitoringTask(@PathVariable String MetricNa
 		is = new ByteArrayInputStream((notifier.toString()).getBytes());
 		if (parser==null) parser= new Analyseur(is); 
 		else parser.ReInit(is);
+		long startTime = System.currentTimeMillis();
 		CreateNotifier notif=parser.CreateNotifierResource();
-		monitorManager.taskProccessing(notif);
 		
+		monitorManager.taskProccessing(notif);
+		long endTime = System.currentTimeMillis();
+		System.out.println("temps necessaire pour declarer un notificateur d'alerte:"+(endTime-startTime));
 		return new ResponseEntity<String> ("Notifier added succesfully with id "+notif.getId() , HttpStatus.OK);
 	}
 		

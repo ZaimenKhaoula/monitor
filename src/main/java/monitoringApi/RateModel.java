@@ -38,7 +38,7 @@ while( j<input.length) {
 	number="";
 	i=0;
 	char [] ch= input[j].toCharArray();
-     for(char c : ch) { if(c !='u' && c !='s'&&  c!='m' && c !='s' && c!='m' && c !='i' && c !='n' && c !='h' && c !='j' && c!='r') 
+     for(char c : ch) { if(c !='u' && c !='s'&&  c!='m'  && c !='i' && c !='n' && c !='h' && c !='j' && c!='r') 
     		 {i++;number = number+Character.toString(c);}
      System.out.println(c);
      }

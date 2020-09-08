@@ -28,11 +28,11 @@ TOKEN : /* OPERATORS */
 | < parenthF: ")" >
 | < virgule:"," >
 | < separateur:":" | "%" >
-| < grammarkeyWords :"Rythme de collecte"|"type"|"params"|"service"|"loop"|"id"|"metriName">
+| < grammarkeyWords :"Rythme de collecte"|"type"|"params"|"service"|"loop"|"id"|"metriName"|"url">
 | < accoladO: "{" >
 | < accoladF: "}" >
 | < RTT:"RTT">
-| < timeUnit:"us"|"ms"|"s"|"min"|"h"|"jr" >
+| < url:("http" | "https")(<alpha>|<DIGIT>|< separateur>|<operateur>|<sym>|<accoladO>|<accoladF>|<sym>)+>
 | <periodic : "periodic" >
 | < stochastic :"stochastic" >
 |< time_serie: "time-serie">
@@ -40,7 +40,8 @@ TOKEN : /* OPERATORS */
 | <updateM: "UpdateMonitor" >
 | <createN : "CreateNotifier" >
 | < loi : "uniform"| "exponential" >
-| < Metric : "NbReqSent" |"NbRespSent" | "NBTopicSubscription"| "NbPublishedMsg" >
+| < Metric : "NbReqSent" |"NbRespSent" | "NBTopicSubscription"| "NbPublishedMsg"|"NbMsgLost" >
+| < timeUnit:"us"|"ms"|"s"|"min"|"h"|"jr" >
 
 }
 
@@ -54,12 +55,10 @@ TOKEN :
 TOKEN :
 {
  < AppName : <grammarkeyWords><number>>
-| < MetricName: (<alpha>)+<number> >
-| < param: (<alpha >|< number >)+ >
+| < MetricName: (<alpha>)+(<number>)? >
 
 | <Id:((<alpha>|<DIGIT>)+<sym>)+<Metric>>
 | <Idms:((<alpha>|<DIGIT>)+<sym>)+ (<alpha>|<DIGIT>)+>
-| < url:("http" | "https")(<alpha>|<DIGIT>|<operateur>|<sym>|<accoladO>|<accoladF>|<sym>)+ (<alpha>)+>
 }
 void start () : {} { CreateMonitoringResource()|UpdateMonitoringResource()|CreateNotifierResource() |ReadMonitoringResource() }
 
@@ -69,8 +68,9 @@ UpdateMonitor UpdateMonitoringResource(): {
   Token tok1=null;
   Token tok2=null;}
    {(
-<updateM>tok1=<Id> {task.setMetricName(tok1.toString());}
-<grammarkeyWords><sym><operateur><grammarkeyWords> 
+<updateM>tok1=<MetricName> {task.setMetricName(tok1.toString());}
+< separateur >
+<grammarkeyWords><operateur><grammarkeyWords> 
 (tok1=<periodic>{task.createRate(tok1.toString());}<grammarkeyWords><accoladO>tok2=<number> { task.getRate().getParameters().add(tok2.toString());}tok2=<timeUnit> { task.getRate().getParameters().add(tok2.toString());}<accoladF>
 |tok1=<stochastic>{task.createRate(tok1.toString());}
 <grammarkeyWords><accoladO>tok2=<loi > { ((StochasticRate)(task.getRate())).setLoi( tok2.toString());}(tok2=<number> { task.getRate().getParameters().add(tok2.toString());}tok2=<timeUnit> { task.getRate().getParameters().add(tok2.toString());})+<accoladF>
@@ -100,9 +100,9 @@ ReadMonitor ReadMonitoringResource():{
 Token tok1= null;
 String rtt="";
 ReadMonitor task = new ReadMonitor();} {(
- tok1=<MetricName> {task.setMetricName(tok1.toString());System.out.println("inside analyser  read monitor");}|
+ tok1=<MetricName> {task.setMetricName(tok1.toString());}|
  tok1=<RTT> {rtt=rtt+tok1.toString();task.setInternalMetricType("rtt");}tok1=<separateur>{rtt=rtt+tok1.toString();}tok1=<Idms>
-{rtt=rtt+tok1.toString();}tok1=<separateur>{rtt=rtt+tok1.toString();}tok1=<Idms>{rtt=rtt+tok1.toString();task.setRttInternalMetric(rtt);}|
+{rtt=rtt+tok1.toString();}tok1=<separateur>{rtt=rtt+tok1.toString();}tok1=<Idms>{rtt=rtt+tok1.toString();task.setRttInternalMetric(rtt);task.setInternalMetric(true);}|
 tok1=<Id>{task.setInternalMetricType("counter");task.setInternalMetricUniqueIdentifier(tok1.toString());task.setInternalMetric(true);}
 )
  
@@ -132,8 +132,8 @@ CreateMonitor CreateMonitoringResource(): {
     |
  
 (
-(tok1=<fonction>{System.out.println(tok1.toString()); task.getExpression().add(tok1.toString());}tok1=<parenthO>{System.out.println(tok1.toString());task.getExpression().add(tok1.toString());})?
-((tok1=<fonction>{System.out.println(tok1.toString());task.getExpression().add(tok1.toString());} tok1=<parenthO>{System.out.println(tok1.toString());task.getExpression().add(tok1.toString());})?
+(tok1=<fonction>{task.getExpression().add(tok1.toString());}tok1=<parenthO>{System.out.println(tok1.toString());task.getExpression().add(tok1.toString());})?
+((tok1=<fonction>{task.getExpression().add(tok1.toString());} tok1=<parenthO>{task.getExpression().add(tok1.toString());})?
 ((tok1=<number>{task.getExpression().add(tok1.toString());}|(<RTT><separateur>tok1=<Idms> {System.out.println(tok1.toString());rtt.setIDusSource(tok1.toString()); (task.getAdminmetric()).setType("rtt");}<separateur>tok1=<Idms>
 {System.out.println(tok1.toString());rtt.setIDusDestination(tok1.toString());} {(task.getExpression()).add(rtt.toString());}{((task.getAdminmetric()).getMetrics()).add(rtt);}))
 (tok1=<operateur>{System.out.println(tok1.toString());task.getExpression().add(tok1.toString());} (tok1=<number>{task.getExpression().add(tok1.toString());}|
